@@ -31,11 +31,11 @@ function sharpspring_requirements($phase) {
   $t = get_t();
 
   if ($phase == 'runtime') {
-    // Raise warning if Google user account has not been set yet.
+    // Raise warning if account has not been set yet.
     if (!_sharpspring_validate_id(variable_get('sharpspring_account', 'KOI-'))) {
       $requirements['sharpspring_account'] = array(
         'title' => $t('SharpSpring module'),
-        'description' => $t('SharpSpring module has not been configured yet. Please configure its settings from the <a href="@url">Google Analytics settings page</a>.', array('@url' => url('admin/config/system/sharpspring'))),
+        'description' => $t('SharpSpring module has not been configured yet. Please configure its settings from the <a href="@url">SharpSpring settings page</a>.', array('@url' => url('admin/config/system/sharpspring'))),
         'severity' => REQUIREMENT_WARNING,
         'value' => $t('Not configured'),
       );

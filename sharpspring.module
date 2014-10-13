@@ -115,8 +115,8 @@ function _sharpspring_visibility_user($account) {
 //
 //    // Use the user's block visibility setting, if necessary.
 //    if (($custom = variable_get('sharpspring_custom', 0)) != 0) {
-//      if ($account->uid && isset($account->data['googleanalytics']['custom'])) {
-//        $enabled = $account->data['googleanalytics']['custom'];
+//      if ($account->uid && isset($account->data['sharpspring']['custom'])) {
+//        $enabled = $account->data['sharpspring']['custom'];
 //      }
 //      else {
 //        $enabled = ($custom == 1);
