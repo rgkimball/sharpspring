@@ -1,0 +1,8 @@
+name = SharpSpring
+author = "Elevated Third"
+description = Allows your site to be tracked by SharpSpring by adding a Javascript tracking code to every page. Adapted from the Google Analytics module by Elevated Third.
+core = 7.x
+package = Statistics
+configure = admin/config/system/sharpspring
+version = "7.x-1.0"
+
