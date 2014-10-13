@@ -29,7 +29,7 @@ function sharpspring_permission() {
   return array(
     'administer sharpspring' => array(
       'title' => t('Administer SharpSpring'),
-      'description' => t('Perform maintenance tasks for Google Analytics.'),
+      'description' => t('Configure SharpSpring module settings.'),
     ),
     // @todo: Make this matter
 //    'opt-in or out of sharpspring tracking' => array(
