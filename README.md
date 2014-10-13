@@ -5,6 +5,7 @@ A Drupal module to track site activity with [SharpSpring](http://www.sharpspring
 
 ##Features
 - [x] Generate tracking code using property ID & tracking domain
+- [x] Configure and add unique lead generation codes to any webforms
 - [ ] Allow configurable user roles
 - [ ] Allow path filters to load inline script contextually
 - [ ] Track certain file extensions

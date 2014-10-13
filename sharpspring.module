@@ -6,7 +6,7 @@
  * Adds the required Javascript to all your Drupal pages to allow tracking by
  * the SharpSpring statistics package.
  *
- * @author: rgkimball, adapted from Alexander Hass
+ * @author: rgkimball
  */
 
 /**
@@ -47,7 +47,7 @@ function sharpspring_menu() {
     'title' => 'SharpSpring',
     'description' => 'Configure tracking behavior to get insights into your website traffic and marketing effectiveness.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_admin_settings_form'),
+    'page arguments' => array('sharpspring_admin_config_form'),
     'access arguments' => array('administer sharpspring'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'sharpspring.admin.inc',
@@ -95,6 +95,36 @@ function sharpspring_page_alter(&$page) {
     drupal_add_js($script, array('scope' => 'header', 'type' => 'inline'));
   } else {
     watchdog('sharpspring', t('The SharpSpring property ID you provided is invalid.<br /> Tracking ID: <strong>!id</strong><br /> Tracking Domian: <strong>!domain</strong>', array('!id' => $id, '!domain' => $domain)));
+  }
+}
+
+/**
+ *  Implements hook_preprocess_page() to add webform tracking codes.
+ */
+function sharpspring_preprocess_page(&$variables){
+  if(isset($variables['node']->type) && $variables['node']->type == 'webform') {
+    $result_check = db_select('sharpspring', 'nid')
+      ->fields('nid')
+      ->condition('nid', $variables['node']->vid, '=')
+      ->condition('status', 1)
+      ->execute();
+
+    // If there's any results, check t.
+    $script = '';
+    foreach($result_check as $result) {
+      $script .= "var __ss_noform = __ss_noform || [];";
+      $script .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
+      $script .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
+    }
+    // If we've added anything to our script var, load the dependent script & add_js
+    if(!empty($script)) {
+      // @todo: Make version # configurable?
+      $noform = "https://" . variable_get('sharpspring_domain', '') . "/client/noform.js?ver=1.0";
+
+      drupal_add_js($script, array('scope' => 'footer', 'type' => 'inline'));
+      drupal_add_js($noform, array('scope' => 'footer'));
+
+    }
   }
 }
 

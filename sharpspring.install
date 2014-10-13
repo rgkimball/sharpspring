@@ -3,7 +3,7 @@
  * @file
  * Installation file for SharpSpring module.
  *
- * @author: rgkimball, adapted from Alexander Hass
+ * @author: rgkimball
  */
 
 /**
@@ -15,12 +15,54 @@ function sharpspring_uninstall() {
 }
 
 /**
+ * Implements hook_schema().
+ */
+function sharpspring_schema() {
+  $schema = array();
+
+  $schema['sharpspring'] = array(
+    'description' => 'Stores SharpSpring tracking IDs for webforms.',
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'length' => 10,
+        'not null' => true,
+        'default' => 0,
+        'description' => 'Node ID',
+      ),
+      'endpoint' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'Form endpoint ID',
+      ),
+      'base_uri' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'Form base URI',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'length' => 1,
+        'default' => 0,
+        'description' => 'Tracking enabled for this form ID',
+      ),
+    ),
+    'unique keys' => array(
+      'nid' => array('nid'),
+    ),
+    'primary key' => array('nid'),
+  );
+
+  return $schema;
+}
+
+/**
  * Implements hook_disable().
  *
  * Remove cache directory if module is disabled (or uninstalled).
  */
 function sharpspring_disable() {
-  sharpspring_clear_js_cache();
+//  sharpspring_clear_js_cache();
 }
 
 /**
