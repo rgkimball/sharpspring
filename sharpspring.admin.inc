@@ -198,7 +198,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
 
       // If there's any results, delete them.
       foreach ($result_check as $result) {
-        if(!empty($result)) {
+        if (!empty($result)) {
           db_delete('sharpspring')
             ->condition('nid', $wid, '=')
             ->execute();

@@ -112,6 +112,7 @@ function sharpspring_preprocess_page(&$variables) {
  *   The value of the property ID.
  *
  * @return bool
+ *   Verify that input matches format.
  */
 function _sharpspring_validate_id($id) {
   // String begins with KOI-, and ends with 6+ word characters(a-z, 0-9 or _).
@@ -124,6 +125,7 @@ function _sharpspring_validate_id($id) {
  *   The value of the API domain.
  *
  * @return bool
+ *   Verify that input matches format.
  */
 function _sharpspring_validate_domain($input) {
   // String begins with koi-, has a 5+ identifier, & ends with sharpspring.com.
@@ -136,6 +138,7 @@ function _sharpspring_validate_domain($input) {
  *   The value of the form's base URI.
  *
  * @return bool
+ *   Verify that input matches format.
  */
 function _sharpspring_validate_uri($input) {
   // String follows format:
@@ -149,6 +152,7 @@ function _sharpspring_validate_uri($input) {
  *   The value of the form's endpoint value.
  *
  * @return bool
+ *   Verify that input matches format.
  */
 function _sharpspring_validate_endpoint($input) {
   // String follows format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
