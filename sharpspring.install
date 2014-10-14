@@ -26,7 +26,7 @@ function sharpspring_schema() {
       'nid' => array(
         'type' => 'int',
         'length' => 10,
-        'not null' => true,
+        'not null' => TRUE,
         'default' => 0,
         'description' => 'Node ID',
       ),
@@ -54,15 +54,6 @@ function sharpspring_schema() {
   );
 
   return $schema;
-}
-
-/**
- * Implements hook_disable().
- *
- * Remove cache directory if module is disabled (or uninstalled).
- */
-function sharpspring_disable() {
-//  sharpspring_clear_js_cache();
 }
 
 /**

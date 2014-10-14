@@ -57,7 +57,7 @@ function sharpspring_validate_sharpspring_account($variable) {
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
   $variable['value'] = str_replace(array('–', '—', '−'), '-', $variable['value']);
 
-  if (!_sharpspring_validate_id( $variable['value'])) {
+  if (!_sharpspring_validate_id($variable['value'])) {
     return t('A valid SharpSpring Web Property ID is case sensitive and formatted like KOI-xxxxxxx.');
   }
 }
@@ -66,7 +66,7 @@ function sharpspring_validate_sharpspring_account($variable) {
  * Validate Web domain variable.
  */
 function sharpspring_validate_sharpspring_domain($variable) {
-  if (!_sharpspring_validate_domain( $variable['value'])) {
+  if (!_sharpspring_validate_domain($variable['value'])) {
     return t('A valid SharpSpring Domain is formatted like koi-XXXXXX.sharpspring.com. Try removing the leading protocol (e.g. https://) or trailing path. (e.g. /somepath).');
   }
 }

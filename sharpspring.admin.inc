@@ -32,7 +32,7 @@ function sharpspring_admin_config_form($form_state) {
     '#size' => 40,
     '#maxlength' => 40,
     '#required' => TRUE,
-    '#description' => t('This is the SharpSpring sub-domain to which tracking information is sent. It is defined in the tracking code as \'_setDomain\'. Omit the protocol and path: it should fit the following format: koi-xxxxxx.sharpspring.com'),
+    '#description' => t("This is the SharpSpring sub-domain to which tracking information is sent. It is defined in the tracking code as '_setDomain'. Omit the protocol and path: it should fit the following format: koi-xxxxxx.sharpspring.com"),
   );
 
   $form['tracking'] = array(
@@ -41,18 +41,18 @@ function sharpspring_admin_config_form($form_state) {
 
   $form['tracking']['webforms'] = array(
     '#title' => t('Webform Lead Generation'),
-    '#description' => t('<p>Add unique tracking IDs to each webform on the site. For each webform you want to track, enter the form\'s endpoint ID as it appears in the unique tracking code. It should be formatted like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (8-4-4-4-12).</p>'),
+    '#description' => t("<p>Add unique tracking IDs to each webform on the site. For each webform you want to track, enter the form's endpoint ID as it appears in the unique tracking code. It should be formatted like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (8-4-4-4-12).</p>"),
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
   );
 
-  // Get list of all webforms
+  // Get list of all webforms.
   $wf_query = db_select('webform', 'nid')
     ->fields('nid')
     ->orderBy('nid', 'ASC')
     ->execute();
 
-  // Get list of all SharpSpring form endpoints
+  // Get list of all SharpSpring form endpoints.
   if (db_table_exists('sharpspring')) {
     $ss_query = db_select('sharpspring', 'nid')
       ->fields('nid')
@@ -79,12 +79,13 @@ function sharpspring_admin_config_form($form_state) {
 
     $enabled = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->status : 0;
     $endpoint = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->endpoint : '';
-    $baseURI = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->base_uri : '';
+    $base_uri = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->base_uri : '';
 
     $form['tracking']['webforms']['enable'][$row->nid] = array(
       '#title' => l($webform->title, 'node/' . $row->nid . '/webform'),
       '#default_value' => $enabled,
-      '#disabled' => $unpublished, // disable checkbox if form is unpublished
+      // Disable checkbox if form is unpublished.
+      '#disabled' => $unpublished,
       '#type' => 'checkbox',
       '#size' => 50,
       '#maxlength' => 40,
@@ -107,8 +108,8 @@ function sharpspring_admin_config_form($form_state) {
 
     $form['tracking']['webforms'][$row->nid]['base_uri_' . $row->nid] = array(
       '#title' => 'Base URI',
-      '#description' => t('The form\'s baseURI will appear in the tracking code as: <pre>__ss_noform.push([\'baseURI\', \'<strong>https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/</strong>\']);</pre>'),
-      '#default_value' => $baseURI,
+      '#description' => t("The form's baseURI will appear in the tracking code as: <pre>__ss_noform.push(['baseURI', '<strong>https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/</strong>']);</pre>"),
+      '#default_value' => $base_uri,
       '#type' => 'textfield',
       '#size' => 50,
       '#maxlength' => 255,
@@ -116,7 +117,7 @@ function sharpspring_admin_config_form($form_state) {
 
     $form['tracking']['webforms'][$row->nid]['endpoint_' . $row->nid] = array(
       '#title' => 'Endpoint',
-      '#description' => t('The form\'s endpoint will appear in the tracking code as: <pre>__ss_noform.push([\'endpoint\', \'<strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>\']);</pre>'),
+      '#description' => t("The form's endpoint will appear in the tracking code as: <pre>__ss_noform.push(['endpoint', '<strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>']);</pre>"),
       '#default_value' => $endpoint,
       '#type' => 'textfield',
       '#size' => 70,
@@ -130,22 +131,6 @@ function sharpspring_admin_config_form($form_state) {
     '#type' => 'hidden',
     '#default_value' => $forms_count,
   );
-
-  /** @todo: These tabs:
-  $form['tracking']['pages'] = array(
-    '#title' => t('Pages'),
-    '#description' => t('@todo: Textarea to add or omit certain paths à la Context'),
-    '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-  );
-
-  $form['tracking']['users'] = array(
-    '#title' => t('Users & Roles'),
-    '#description' => t('@todo: List all user roles w/ a checkbox for each'),
-    '#type' => 'fieldset',
-    '#collapsible' => TRUE,
-  );
-  */
 
   $form['save'] = array(
     '#value' => 'Save configuration',
@@ -164,7 +149,9 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
   $form_state['values']['sharpspring_domain'] = trim($form_state['values']['sharpspring_domain']);
 
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
-  $form_state['values']['sharpspring_account'] = str_replace(array('–', '—', '−'), '-', $form_state['values']['sharpspring_account']);
+  $form_state['values']['sharpspring_account'] = str_replace(array(
+    '–', '—', '−'
+  ), '-', $form_state['values']['sharpspring_account']);
 
   if (!_sharpspring_validate_id($form_state['values']['sharpspring_account'])) {
     form_set_error('sharpspring_account', t('A valid SharpSpring Web Property ID is case sensitive and formatted like KOI-xxxxxxx.'));
@@ -190,13 +177,13 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
     $endpoint = $form['tracking']['webforms'][$wid]['endpoint_' . $wid]['#value'];
 
     // If the form tracking isn't active, it doesn't matter if these are wrong.
-    if($status == 1) {
+    if ($status == 1) {
       // Check whether the base URI and endpoint will actually work.
-      if(!_sharpspring_validate_endpoint($endpoint)) {
+      if (!_sharpspring_validate_endpoint($endpoint)) {
         form_set_error('endpoint_' . $wid, t('A valid SharpSpring Endpoint is formatted like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx. Please check for any whitespace in your entry.'));
         continue;
       }
-      if(!_sharpspring_validate_uri($base_uri)) {
+      if (!_sharpspring_validate_uri($base_uri)) {
         form_set_error('base_uri_' . $wid, t('A valid SharpSpring Base URI is formatted like https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX.'));
         continue;
       }
@@ -210,13 +197,13 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
         ->execute();
 
       // If there's any results, delete them.
-      foreach($result_check as $result) {
+      foreach ($result_check as $result) {
         db_delete('sharpspring')
         ->condition('nid', $wid, '=')
         ->execute();
       }
 
-      // Now save new info
+      // Now save new info.
       db_insert('sharpspring')
         ->fields(array(
           'nid' => check_plain($wid),
@@ -228,7 +215,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
 
       $webform = node_load($wid);
 
-      if($status == 1) {
+      if ($status == 1) {
         drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title));
       }
     }
