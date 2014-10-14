@@ -116,7 +116,7 @@ function sharpspring_admin_config_form($form_state) {
     );
 
     $form['tracking']['webforms'][$row->nid]['endpoint_' . $row->nid] = array(
-      '#title' => 'Base URI',
+      '#title' => 'Endpoint',
       '#description' => t('The form\'s endpoint will appear in the tracking code as: <pre>__ss_noform.push([\'endpoint\', \'<strong>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</strong>\']);</pre>'),
       '#default_value' => $endpoint,
       '#type' => 'textfield',
@@ -170,8 +170,14 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
   if (!_sharpspring_validate_id($form_state['values']['sharpspring_account'])) {
     form_set_error('sharpspring_account', t('A valid SharpSpring Web Property ID is case sensitive and formatted like KOI-xxxxxxx.'));
   }
+  else {
+    variable_set('sharpspring_account', $form_state['values']['sharpspring_account']);
+  }
   if (!_sharpspring_validate_domain($form_state['values']['sharpspring_domain'])) {
     form_set_error('sharpspring_domain', t('A valid SharpSpring Domain is formatted like koi-XXXXXX.sharpspring.com. Try removing the leading protocol (e.g. https://) or trailing path. (e.g. /somepath).'));
+  }
+  else {
+    variable_set('sharpspring_domain', $form_state['values']['sharpspring_domain']);
   }
 
   // Only get numeric array keys within webforms group (i.e. webform nids)
@@ -183,6 +189,19 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
     $status = $form['tracking']['webforms']['enable'][$wid]['#value'];
     $base_uri = $form['tracking']['webforms'][$wid]['base_uri_' . $wid]['#value'];
     $endpoint = $form['tracking']['webforms'][$wid]['endpoint_' . $wid]['#value'];
+
+    // If the form tracking isn't active, it doesn't matter if these are wrong.
+    if($status == 1) {
+      // Check whether the base URI and endpoint will actually work.
+      if(!_sharpspring_validate_endpoint($endpoint)) {
+        form_set_error('endpoint_' . $wid, t('A valid SharpSpring Endpoint is formatted like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx. Please check for any whitespace in your entry.'));
+        continue;
+      }
+      if(!_sharpspring_validate_uri($base_uri)) {
+        form_set_error('base_uri_' . $wid, t('A valid SharpSpring Base URI is formatted like https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX.'));
+        continue;
+      }
+    }
 
     if (isset($wid) && isset($status) && isset($base_uri) && isset($endpoint)) {
 
@@ -201,10 +220,10 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
       // Now save new info
       db_insert('sharpspring')
         ->fields(array(
-          'nid' => $wid,
-          'base_uri' => $base_uri,
-          'endpoint' => $endpoint,
-          'status' => $status,
+          'nid' => check_plain($wid),
+          'base_uri' => check_plain($base_uri),
+          'endpoint' => check_plain($endpoint),
+          'status' => check_plain($status),
         ))
         ->execute();
 

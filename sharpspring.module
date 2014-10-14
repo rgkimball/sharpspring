@@ -179,5 +179,25 @@ function _sharpspring_validate_id($id) {
  */
 function _sharpspring_validate_domain($input) {
   // string begins with koi-, has a 5+ identifier, & ends with sharpspring.com
-  return preg_match('/^koi-\w{5,}.sharpspring.com\z/', $input);
+  return preg_match('/^koi-\w{5,}.sharpspring.com\z/i', $input);
+}
+/**
+ * Helper to validate a SharpSpring base URI format w/ regex
+ *
+ * @param $input
+ * @return bool
+ */
+function _sharpspring_validate_uri($input) {
+  // string follows format: https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/
+  return preg_match('/^https:\/\/app-\w{5,}.sharpspring.com\/webforms\/receivePostback\/\w{6,}/i', $input);
+}
+/**
+ * Helper to validate a SharpSpring endpoint w/ regex
+ *
+ * @param $input
+ * @return bool
+ */
+function _sharpspring_validate_endpoint($input) {
+  // string follows format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  return preg_match('/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\z/', $input);
 }
