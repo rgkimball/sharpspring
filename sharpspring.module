@@ -40,7 +40,8 @@ function sharpspring_menu() {
 
 /**
  * Implements hook_page_alter().
- *   Used to insert JavaScript to the appropriate scope/region of the page.
+ *
+ * Used to insert JavaScript to the appropriate scope/region of the page.
  */
 function sharpspring_page_alter(&$page) {
 
@@ -75,7 +76,8 @@ function sharpspring_page_alter(&$page) {
 
 /**
  * Implements hook_preprocess_page().
- *   Used to add webform tracking codes.
+ *
+ * Used to add webform tracking codes.
  */
 function sharpspring_preprocess_page(&$variables) {
   if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
@@ -106,7 +108,7 @@ function sharpspring_preprocess_page(&$variables) {
 /**
  * Helper to validate a SharpSpring Web Property ID's format w/ regex.
  *
- * @param $id string
+ * @param string $id
  *   The value of the property ID.
  *
  * @return bool
@@ -118,37 +120,37 @@ function _sharpspring_validate_id($id) {
 /**
  * Helper to validate a SharpSpring domain format w/ regex.
  *
- * @param $input string
+ * @param string $input
  *   The value of the API domain.
  *
  * @return bool
  */
 function _sharpspring_validate_domain($input) {
-  // string begins with koi-, has a 5+ identifier, & ends with sharpspring.com.
+  // String begins with koi-, has a 5+ identifier, & ends with sharpspring.com.
   return preg_match('/^koi-\w{5,}.sharpspring.com\z/i', $input);
 }
 /**
  * Helper to validate a SharpSpring base URI format w/ regex.
  *
- * @param $input string
+ * @param string $input
  *   The value of the form's base URI.
  *
  * @return bool
  */
 function _sharpspring_validate_uri($input) {
-  // string follows format:
-  //   https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/.
+  // String follows format:
+  // https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/.
   return preg_match('/^https:\/\/app-\w{5,}.sharpspring.com\/webforms\/receivePostback\/\w{6,}/i', $input);
 }
 /**
  * Helper to validate a SharpSpring endpoint w/ regex.
  *
- * @param $input string
+ * @param string $input
  *   The value of the form's endpoint value.
  *
  * @return bool
  */
 function _sharpspring_validate_endpoint($input) {
-  // string follows format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
+  // String follows format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
   return preg_match('/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\z/', $input);
 }

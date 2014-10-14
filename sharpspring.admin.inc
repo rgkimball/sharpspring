@@ -150,7 +150,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
 
   // Replace all type of dashes (n-dash, m-dash, minus) with the normal dashes.
   $form_state['values']['sharpspring_account'] = str_replace(array(
-    '–', '—', '−'
+    '–', '—', '−',
   ), '-', $form_state['values']['sharpspring_account']);
 
   if (!_sharpspring_validate_id($form_state['values']['sharpspring_account'])) {
@@ -166,7 +166,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
     variable_set('sharpspring_domain', $form_state['values']['sharpspring_domain']);
   }
 
-  // Only get numeric array keys within webforms group (i.e. webform nids)
+  // Only get numeric array keys within webforms group (i.e. webform nids).
   $keys = array_filter(array_keys($form['tracking']['webforms']), 'is_int');
 
   $i = 0;
@@ -198,9 +198,11 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
 
       // If there's any results, delete them.
       foreach ($result_check as $result) {
-        db_delete('sharpspring')
-        ->condition('nid', $wid, '=')
-        ->execute();
+        if(!empty($result)) {
+          db_delete('sharpspring')
+            ->condition('nid', $wid, '=')
+            ->execute();
+        }
       }
 
       // Now save new info.
