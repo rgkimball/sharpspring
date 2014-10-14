@@ -10,19 +10,6 @@
  */
 
 /**
- * Define the default file extension list that should be tracked as download.
- * @todo: This is currently meaningless
- */
-//define('SHARPSPRING_TRACKFILES_EXTENSIONS', '7z|aac|arc|arj|asf|asx|avi|bin|csv|doc|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xml|z|zip');
-
-/**
- * Define default path exclusion list to remove tracking from admin pages,
- * see http://drupal.org/node/34970 for more information.
- * @todo: priority: need to add per-page tracking
- */
-//define('SHARPSPRING_PAGES', "admin\nadmin/*\nbatch\nnode/add*\nnode/*/*\nuser/*/*");
-
-/**
  * Implements hook_permission().
  */
 function sharpspring_permission() {
@@ -31,11 +18,6 @@ function sharpspring_permission() {
       'title' => t('Administer SharpSpring'),
       'description' => t('Configure SharpSpring module settings.'),
     ),
-    // @todo: Make this matter
-//    'opt-in or out of sharpspring tracking' => array(
-//      'title' => t('Opt-in or out of SharpSpring tracking'),
-//      'description' => t('Allow users to decide if SharpSpring tracking code will be added to pages or not.'),
-//    ),
   );
 }
 
@@ -65,16 +47,9 @@ function sharpspring_page_alter(&$page) {
   $id = variable_get('sharpspring_account', '');
   $domain = variable_get('sharpspring_domain', '');
 
-  // Get page status code for visibility filtering.
-//  $status = drupal_get_http_header('Status');
-//  $trackable_status_codes = array(
-//    '403 Forbidden',
-//    '404 Not Found',
-//  );
-
   // 1. Check if the SS account number has a valid value.
-  // 2. Only track user roles defined in admin.inc @todo
-  if (_sharpspring_validate_id($id) && _sharpspring_visibility_user($user)) {
+  // 2. Create and insert inline js.
+  if (_sharpspring_validate_id($id)) {
 
     // Build tracker code.
     $script = 'var _ss = _ss || []; ';
@@ -91,7 +66,6 @@ function sharpspring_page_alter(&$page) {
     $script .= "scr.parentNode.insertBefore(ss, scr); ";
     $script .= "})(); ";
 
-    // Add compiled tracking code @todo make this bit conditional
     drupal_add_js($script, array('scope' => 'header', 'type' => 'inline'));
   } else {
     watchdog('sharpspring', t('The SharpSpring property ID you provided is invalid.<br /> Tracking ID: <strong>!id</strong><br /> Tracking Domian: <strong>!domain</strong>', array('!id' => $id, '!domain' => $domain)));
@@ -118,7 +92,6 @@ function sharpspring_preprocess_page(&$variables){
     }
     // If we've added anything to our script var, load the dependent script & add_js
     if(!empty($script)) {
-      // @todo: Make version # configurable?
       $noform = "https://" . variable_get('sharpspring_domain', '') . "/client/noform.js?ver=1.0";
 
       drupal_add_js($script, array('scope' => 'footer', 'type' => 'inline'));
@@ -126,39 +99,6 @@ function sharpspring_preprocess_page(&$variables){
 
     }
   }
-}
-
-/**
- * Tracking visibility check for an user object.
- *
- * @param $account
- *   A user object containing an array of roles to check.
- * @return boolean
- *   A decision on if the current user is being tracked by Google Analytics.
- */
-function _sharpspring_visibility_user($account) {
-//
-//  $enabled = FALSE;
-//
-//  // Is current user a member of a role that should be tracked?
-//  if (_sharpspring_visibility_header($account) && _sharpspring_visibility_roles($account)) {
-//
-//    // Use the user's block visibility setting, if necessary.
-//    if (($custom = variable_get('sharpspring_custom', 0)) != 0) {
-//      if ($account->uid && isset($account->data['sharpspring']['custom'])) {
-//        $enabled = $account->data['sharpspring']['custom'];
-//      }
-//      else {
-//        $enabled = ($custom == 1);
-//      }
-//    }
-//    else {
-//      $enabled = TRUE;
-//    }
-//
-//  }
-//  return $enabled;
-  return TRUE; // @todo
 }
 
 /**

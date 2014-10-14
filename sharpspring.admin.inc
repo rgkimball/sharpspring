@@ -75,7 +75,6 @@ function sharpspring_admin_config_form($form_state) {
     $forms_count++;
     $webform = node_load($row->nid);
 
-    $thisrow = 'webform_row_' . $row->nid;
     $unpublished = !$webform->status;
 
     $enabled = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->status : 0;
@@ -230,7 +229,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
       $webform = node_load($wid);
 
       if($status == 1) {
-        drupal_set_message('Successfully saved data for ' . $webform->title . ' form');
+        drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title));
       }
     }
     else {
@@ -239,5 +238,4 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
 
     $i++;
   }
-
 }
