@@ -218,7 +218,7 @@ function sharpspring_admin_config_form_validate($form, &$form_state) {
       $webform = node_load($wid);
 
       if ($status == 1) {
-        drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title));
+        drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title)));
       }
     }
     else {
