@@ -75,15 +75,15 @@ function sharpspring_page_alter(&$page) {
 }
 
 /**
- * Implements hook_preprocess_page().
+ * Implements hook_node_view().
  *
  * Used to add webform tracking codes.
  */
-function sharpspring_preprocess_page(&$variables) {
-  if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
+function sharpspring_node_view($node, $view_mode, $langcode) {
+  if (isset($node->type) && $node->type == 'webform') {
     $result_check = db_select('sharpspring', 'nid')
       ->fields('nid')
-      ->condition('nid', $variables['node']->vid, '=')
+      ->condition('nid', $node->vid, '=')
       ->condition('status', 1)
       ->execute();
 
