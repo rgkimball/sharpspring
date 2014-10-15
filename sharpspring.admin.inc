@@ -82,7 +82,7 @@ function sharpspring_admin_config_form($form_state) {
     $base_uri = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->base_uri : '';
 
     $form['tracking']['webforms']['enable'][$row->nid] = array(
-      '#title' => l($webform->title, 'node/' . $row->nid . '/webform'),
+      '#title' => l($webform->title, 'node/' . $row->nid),
       '#default_value' => $enabled,
       // Disable checkbox if form is unpublished.
       '#disabled' => $unpublished,
