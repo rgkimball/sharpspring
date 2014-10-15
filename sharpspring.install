@@ -12,6 +12,9 @@
 function sharpspring_uninstall() {
   variable_del('sharpspring_account');
   variable_del('sharpspring_domain');
+  if(db_table_exists('sharpspring')) {
+    db_query('DROP TABLE {sharpspring}');
+  }
 }
 
 /**
