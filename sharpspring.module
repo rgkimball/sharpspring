@@ -55,10 +55,13 @@ function sharpspring_page_alter(&$page) {
     $pagejs = drupal_get_path('module', 'sharpspring') . '/js/sharpspring-page.js';
 
     // Add property settings to Drupal.settings.
-    drupal_add_js(array('sharpspring' => array(
-      'domain' => $domain,
-      'id' => $id,
-    )), array('type' => 'setting'));
+    drupal_add_js(array(
+      'sharpspring' => array(
+        'domain' => $domain,
+        'id' => $id,
+      )),
+      array('type' => 'setting')
+    );
 
     drupal_add_js($pagejs, array('scope' => 'header', 'preprocessed' => TRUE));
   }

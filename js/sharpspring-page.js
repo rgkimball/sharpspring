@@ -1,6 +1,6 @@
 /**
  * @file
- * Adds SharpSpring page tracking
+ * Adds SharpSpring page tracking.
  *
  * @author: rgkimball
  */
