@@ -45,25 +45,27 @@ function sharpspring_menu() {
  */
 function sharpspring_page_alter(&$page) {
 
-  $id = variable_get('sharpspring_account', '');
-  $domain = variable_get('sharpspring_domain', '');
+  $id = variable_get('sharpspring_account');
+  $domain = variable_get('sharpspring_domain');
 
   // 1. Check if the SS account number and domain have valid values.
   // 2. Create and insert js.
   if (_sharpspring_validate_id($id) && _sharpspring_validate_domain($domain)) {
 
-    $pagejs = drupal_get_path('module', 'sharpspring') . '/js/sharpspring-page.js';
+    $pagejs = 'var _ss = _ss || []; ';
+    $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']); ";
+    $pagejs .= "_ss.push(['_setAccount', '" . $id ."']); ";
+    $pagejs .= "_ss.push(['_trackPageView']); ";
+    $pagejs .= "(function() { ";
+    $pagejs .= "var ss = document.createElement('script'); ";
+    $pagejs .= "ss.type = 'text/javascript'; ss.async = true; ";
+    $pagejs .= "ss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js?ver=1.1.1'; ";
+    $pagejs .= "var scr = document.getElementsByTagName('script')[0]; ";
+    $pagejs .= "scr.parentNode.insertBefore(ss, scr); ";
+    $pagejs .= "})(); ";
 
-    // Add property settings to Drupal.settings.
-    drupal_add_js(array(
-      'sharpspring' => array(
-        'domain' => $domain,
-        'id' => $id,
-      )),
-      array('type' => 'setting')
-    );
-
-    drupal_add_js($pagejs, array('scope' => 'header', 'preprocessed' => TRUE));
+    // Add compiled tracking code.
+    drupal_add_js($pagejs, array('scope' => 'header', 'type' => 'inline'));
   }
 }
 
@@ -72,35 +74,27 @@ function sharpspring_page_alter(&$page) {
  *
  * Used to add webform tracking codes.
  */
-function sharpspring_node_view($node, $view_mode, $langcode) {
-  if (isset($node->type) && $node->type == 'webform') {
+function sharpspring_preprocess_page(&$variables){
+  if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
     $result_check = db_select('sharpspring', 'nid')
       ->fields('nid')
-      ->condition('nid', $node->vid, '=')
+      ->condition('nid', $variables['node']->vid, '=')
       ->condition('status', 1)
       ->execute();
 
     // If there's any results, check t.
-    $form = array();
+    $formjs = '';
     foreach ($result_check as $result) {
-      $form[$node->vid]['base_uri'] = $result->base_uri;
-      $form[$node->vid]['endpoint'] = $result->endpoint;
+      $formjs .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
+      $formjs .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
     }
     // If we've added anything to our script var, load the dependent script.
-    if (!empty($form)) {
-      $noform = "https://" . variable_get('sharpspring_domain', '') . "/client/noform.js?ver=1.0";
+    if (!empty($formjs)) {
+      $noform = "https://" . variable_get('sharpspring_domain') . "/client/noform.js?ver=1.0";
+      $formjs = "var __ss_noform = __ss_noform || [];" . $formjs;
 
-      // Add form data to Drupal.settings.
-      drupal_add_js(array(
-        'sharpspring' => array('forms' => $form)),
-        array('type' => 'setting')
-      );
-
-      $formjs = drupal_get_path('module', 'sharpspring') . '/js/sharpspring-form.js';
-
-      drupal_add_js($formjs, array('scope' => 'header', 'preprocessed' => TRUE));
-      drupal_add_js($noform, array('scope' => 'footer'));
-
+      drupal_add_js($formjs, array('scope' => 'footer', 'preprocessed' => FALSE, 'type' => 'inline', 'weight' => 2));
+      drupal_add_js($noform, array('scope' => 'footer', 'preprocessed' => FALSE, 'weight' => 3));
     }
   }
 }
@@ -118,6 +112,7 @@ function _sharpspring_validate_id($id) {
   // String begins with KOI-, and ends with 6+ word characters(a-z, 0-9 or _).
   return preg_match('/^KOI-\w{6,}\z/', $id);
 }
+
 /**
  * Helper to validate a SharpSpring domain format w/ regex.
  *
@@ -131,6 +126,7 @@ function _sharpspring_validate_domain($input) {
   // String begins with koi-, has a 5+ identifier, & ends with sharpspring.com.
   return preg_match('/^koi-\w{5,}.sharpspring.com\z/i', $input);
 }
+
 /**
  * Helper to validate a SharpSpring base URI format w/ regex.
  *
@@ -145,6 +141,7 @@ function _sharpspring_validate_uri($input) {
   // https://app-XXXXXX.sharpspring.com/webforms/receivePostback/XXXXXXXX/.
   return preg_match('/^https:\/\/app-\w{5,}.sharpspring.com\/webforms\/receivePostback\/\w{6,}/i', $input);
 }
+
 /**
  * Helper to validate a SharpSpring endpoint w/ regex.
  *
