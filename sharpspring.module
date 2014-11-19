@@ -54,7 +54,7 @@ function sharpspring_page_alter(&$page) {
 
     $pagejs = 'var _ss = _ss || []; ';
     $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']); ";
-    $pagejs .= "_ss.push(['_setAccount', '" . $id ."']); ";
+    $pagejs .= "_ss.push(['_setAccount', '" . $id . "']); ";
     $pagejs .= "_ss.push(['_trackPageView']); ";
     $pagejs .= "(function() { ";
     $pagejs .= "var ss = document.createElement('script'); ";
@@ -74,7 +74,7 @@ function sharpspring_page_alter(&$page) {
  *
  * Used to add webform tracking codes.
  */
-function sharpspring_preprocess_page(&$variables){
+function sharpspring_preprocess_page(&$variables) {
   if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
     $result_check = db_select('sharpspring', 'nid')
       ->fields('nid')
@@ -93,8 +93,15 @@ function sharpspring_preprocess_page(&$variables){
       $noform = "https://" . variable_get('sharpspring_domain') . "/client/noform.js?ver=1.0";
       $formjs = "var __ss_noform = __ss_noform || [];" . $formjs;
 
-      drupal_add_js($formjs, array('scope' => 'footer', 'preprocessed' => FALSE, 'type' => 'inline', 'weight' => 2));
-      drupal_add_js($noform, array('scope' => 'footer', 'preprocessed' => FALSE, 'weight' => 3));
+      drupal_add_js($formjs, array(
+        'scope' => 'footer',
+        'preprocessed' => FALSE,
+        'type' => 'inline',
+        'weight' => 2));
+      drupal_add_js($noform, array(
+        'scope' => 'footer',
+        'preprocessed' => FALSE,
+        'weight' => 3));
     }
   }
 }
