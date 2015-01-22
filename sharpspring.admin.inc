@@ -75,7 +75,7 @@ function sharpspring_admin_config_form($form_state) {
     $forms_count++;
     $webform = node_load($row->nid);
 
-    $unpublished = !$webform->status;
+    $unpublished = (isset($webform->status)) ? !$webform->status : true;
 
     $enabled = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->status : 0;
     $endpoint = (isset($webform_codes[$row->nid])) ? $webform_codes[$row->nid]->endpoint : '';
