@@ -126,8 +126,14 @@ function sharpspring_admin_config_form($form_state) {
 
   }
 
+  if (isset($webform)) {
+    $title = $webform->title;
+  }
+  else {
+    $title = '';
+  }
   $form['tracking']['webforms']['count'] = array(
-    '#title' => $webform->title,
+    '#title' => $title,
     '#type' => 'hidden',
     '#default_value' => $forms_count,
   );
