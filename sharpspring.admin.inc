@@ -35,6 +35,10 @@ function sharpspring_admin_config_form($form_state) {
     '#description' => t("This is the SharpSpring sub-domain to which tracking information is sent. It is defined in the tracking code as '_setDomain'. Omit the protocol and path: it should fit the following format: koi-xxxxxx.sharpspring.com"),
   );
 
+  $form['account']['finding_values'] = array(
+    '#markup' => t('For more information on how to find and set these values please see <a href="http://help.sharpspring.com/customer/portal/articles/1497453-how-to-insert-sharpspring-tracking-code-how-to-add-additional-sites" target="_blank">http://help.sharpspring.com/customer/portal/articles/1497453-how-to-insert-sharpspring-tracking-code-how-to-add-additional-sites</a>'),
+  );
+
   $form['tracking'] = array(
     '#type' => 'vertical_tabs',
   );
