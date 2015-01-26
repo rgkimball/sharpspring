@@ -70,43 +70,6 @@ function sharpspring_page_alter(&$page) {
 }
 
 /**
- * Implements hook_node_view().
- *
- * Used to add webform tracking codes.
- */
-function sharpspring_preprocess_page(&$variables) {
-  if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
-    $result_check = db_select('sharpspring', 'nid')
-      ->fields('nid')
-      ->condition('nid', $variables['node']->vid, '=')
-      ->condition('status', 1)
-      ->execute();
-
-    // If there's any results, check t.
-    $formjs = '';
-    foreach ($result_check as $result) {
-      $formjs .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
-      $formjs .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
-    }
-    // If we've added anything to our script var, load the dependent script.
-    if (!empty($formjs)) {
-      $noform = "https://" . variable_get('sharpspring_domain') . "/client/noform.js?ver=1.0";
-      $formjs = "var __ss_noform = __ss_noform || [];" . $formjs;
-
-      drupal_add_js($formjs, array(
-        'scope' => 'footer',
-        'preprocessed' => FALSE,
-        'type' => 'inline',
-        'weight' => 2));
-      drupal_add_js($noform, array(
-        'scope' => 'footer',
-        'preprocessed' => FALSE,
-        'weight' => 3));
-    }
-  }
-}
-
-/**
  * Helper to validate a SharpSpring Web Property ID's format w/ regex.
  *
  * @param string $id

@@ -12,51 +12,6 @@
 function sharpspring_uninstall() {
   variable_del('sharpspring_account');
   variable_del('sharpspring_domain');
-  if (db_table_exists('sharpspring')) {
-    db_query('DROP TABLE {sharpspring}');
-  }
-}
-
-/**
- * Implements hook_schema().
- */
-function sharpspring_schema() {
-  $schema = array();
-
-  $schema['sharpspring'] = array(
-    'description' => 'Stores SharpSpring tracking IDs for webforms.',
-    'fields' => array(
-      'nid' => array(
-        'type' => 'int',
-        'length' => 10,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Node ID',
-      ),
-      'endpoint' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'description' => 'Form endpoint ID',
-      ),
-      'base_uri' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'description' => 'Form base URI',
-      ),
-      'status' => array(
-        'type' => 'int',
-        'length' => 1,
-        'default' => 0,
-        'description' => 'Tracking enabled for this form ID',
-      ),
-    ),
-    'unique keys' => array(
-      'nid' => array('nid'),
-    ),
-    'primary key' => array('nid'),
-  );
-
-  return $schema;
 }
 
 /**
