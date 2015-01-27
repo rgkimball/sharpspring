@@ -41,6 +41,7 @@ function ss_webforms_preprocess_page(&$variables) {
       drupal_add_js($noform, array(
         'scope' => 'footer',
         'preprocessed' => FALSE,
+        'type' => 'external',
         'weight' => 3));
     }
   }
