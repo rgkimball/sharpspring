@@ -52,14 +52,18 @@ function sharpspring_page_alter(&$page) {
   // 2. Create and insert js.
   if (_sharpspring_validate_id($id) && _sharpspring_validate_domain($domain)) {
 
-    $pagejs = 'var _ss = _ss || []; ';
+    $pagejs = 'var ssDrupalCallback = function(resp) {';
+    $pagejs .= 'console.log(resp);';
+    $pagejs .= '};';
+    $pagejs .= 'var _ss = _ss || []; ';
     $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']); ";
     $pagejs .= "_ss.push(['_setAccount', '" . $id . "']); ";
+    $pagejs .= "_ss.push(['_setResponseCallback', ssDrupalCallback]); ";
     $pagejs .= "_ss.push(['_trackPageView']); ";
     $pagejs .= "(function() { ";
     $pagejs .= "var ss = document.createElement('script'); ";
     $pagejs .= "ss.type = 'text/javascript'; ss.async = true; ";
-    $pagejs .= "ss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js?ver=1.1.1'; ";
+    $pagejs .= "ss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js'; ";
     $pagejs .= "var scr = document.getElementsByTagName('script')[0]; ";
     $pagejs .= "scr.parentNode.insertBefore(ss, scr); ";
     $pagejs .= "})(); ";

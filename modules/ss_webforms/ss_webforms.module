@@ -10,49 +10,68 @@
  */
 
 /**
- * Implements hook_node_view().
+ * Implements hook_form_alter().
  *
- * Used to add webform tracking codes.
+ * Adds sharpspring tracking javascript to selected webforms.
  */
-function ss_webforms_preprocess_page(&$variables) {
-  if (isset($variables['node']->type) && $variables['node']->type == 'webform') {
-    $result_check = db_select('sharpspring_webforms', 'nid')
-      ->fields('nid')
-      ->condition('nid', $variables['node']->vid, '=')
-      ->condition('status', 1)
-      ->execute();
+function ss_webforms_form_alter(&$form, &$form_state, $form_id) {
 
-    // If there's any results, check t.
-    $formjs = '';
-    foreach ($result_check as $result) {
-      $formjs .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
-      $formjs .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
-    }
-    // If we've added anything to our script var, load the dependent script.
-    if (!empty($formjs)) {
-      $noform = "https://" . variable_get('sharpspring_domain') . "/client/noform.js?ver=1.0";
-      $formjs = "var __ss_noform = __ss_noform || [];" . $formjs;
+  // From webform.module to determine if the form is a webform.
+  if (strpos($form_id, 'webform_client_form_') === 0) {
 
-      drupal_add_js($formjs, array(
-        'scope' => 'footer',
-        'preprocessed' => FALSE,
-        'type' => 'inline',
-        'weight' => 2));
-      drupal_add_js($noform, array(
-        'scope' => 'footer',
-        'preprocessed' => FALSE,
-        'type' => 'external',
-        'weight' => 3));
+    $has_added_form_js = &drupal_static('ss_webform_has_added_js');
+
+    // Grab the webform id.
+    $webform_id = str_replace('webform_client_form_', '', $form_id);
+
+    if (!empty($webform_id)) {
+      $result_check = db_select('sharpspring_webforms', 'sw')
+        ->fields('sw')
+        ->condition('nid', $webform_id, '=')
+        ->condition('status', 1)
+        ->execute()
+        ->fetchAll();
+
+      if (empty($has_added_form_js)) {
+        // We haven't added the sharpspring form js to the footer yet.
+        $noform = "https://" . variable_get('sharpspring_domain') . "/client/noform.js?ver=1.0";
+        drupal_add_js($noform, array(
+          'scope' => 'footer',
+          'preprocessed' => FALSE,
+          'type' => 'external',
+          'weight' => 3));
+
+        $has_added_form_js = TRUE;
+      }
+
+      foreach ($result_check as $result) {
+        // Add js for each webform identified on the sharpspring config page.
+        if (!empty($result->base_uri) && !empty($result->endpoint) && !empty($result->nid)) {
+          $formjs = '<script type="text/javascript">';
+          $formjs .= "var __ss_noform = __ss_noform || [];";
+          $formjs .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
+          $formjs .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
+          // Target the specific webform form by #id.
+          $formjs .= "__ss_noform.push(['form', 'webform-client-form-" . $result->nid . "']);";
+          $formjs .= '</script>';
+
+          $form['#suffix'] = $formjs;
+        }
+
+      }
+
     }
+
   }
+
 }
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds webform config to sharpspring config page.
  */
 function ss_webforms_form_sharpspring_admin_config_form_alter(&$form, &$form_state, $form_id) {
-
-  $foo = 'bar';
 
   $form['tracking']['webforms'] = array(
     '#title' => t('Webform Lead Generation'),
