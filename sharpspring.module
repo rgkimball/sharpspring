@@ -32,7 +32,7 @@ function sharpspring_menu() {
     'page arguments' => array('sharpspring_admin_config_form'),
     'access arguments' => array('administer sharpspring'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'sharpspring.admin.inc',
+    'file' => 'includes/sharpspring.admin.inc',
   );
 
   return $items;
@@ -52,21 +52,22 @@ function sharpspring_page_alter(&$page) {
   // 2. Create and insert js.
   if (_sharpspring_validate_id($id) && _sharpspring_validate_domain($domain)) {
 
-    $pagejs = 'var ssDrupalCallback = function(resp) {';
-    $pagejs .= 'console.log(resp);';
-    $pagejs .= '};';
-    $pagejs .= 'var _ss = _ss || []; ';
-    $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']); ";
-    $pagejs .= "_ss.push(['_setAccount', '" . $id . "']); ";
-    $pagejs .= "_ss.push(['_setResponseCallback', ssDrupalCallback]); ";
-    $pagejs .= "_ss.push(['_trackPageView']); ";
-    $pagejs .= "(function() { ";
-    $pagejs .= "var ss = document.createElement('script'); ";
-    $pagejs .= "ss.type = 'text/javascript'; ss.async = true; ";
-    $pagejs .= "ss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js'; ";
-    $pagejs .= "var scr = document.getElementsByTagName('script')[0]; ";
-    $pagejs .= "scr.parentNode.insertBefore(ss, scr); ";
-    $pagejs .= "})(); ";
+    // Add javascript to handle Sharpspring callback.
+    $path = drupal_get_path('module', 'sharpspring');
+    drupal_add_js($path . '/js/drupal_sharpspring.js');
+
+    $pagejs = "var _ss = _ss || [];\n";
+    $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']);\n";
+    $pagejs .= "_ss.push(['_setAccount', '" . $id . "']);\n";
+    $pagejs .= "_ss.push(['_setResponseCallback', ssDrupalCallback]);\n";
+    $pagejs .= "_ss.push(['_trackPageView']);\n";
+    $pagejs .= "(function() {\n";
+    $pagejs .= "\tvar ss = document.createElement('script');\n";
+    $pagejs .= "\tss.type = 'text/javascript'; ss.async = true;\n";
+    $pagejs .= "\tss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js';\n";
+    $pagejs .= "\tvar scr = document.getElementsByTagName('script')[0];\n";
+    $pagejs .= "\tscr.parentNode.insertBefore(ss, scr);\n";
+    $pagejs .= "})();\n";
 
     // Add compiled tracking code.
     drupal_add_js($pagejs, array('scope' => 'header', 'type' => 'inline'));
