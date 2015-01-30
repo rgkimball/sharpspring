@@ -69,7 +69,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
 
     $n = 0;
     foreach ($segments as $segment) {
-      $form['ss_block_' . $bid]['segment_' . $bid . ';' . $n] = array(
+      $form['ss_block_' . $bid]['segment_' . $bid . ';' . $segment] = array(
         '#type' => 'select',
         '#title' => $segment,
         '#options' => $blocks,
@@ -100,6 +100,21 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
  */
 function ss_contextual_blocks_config_form_submit($form, &$form_state) {
   $input_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+
+  foreach ($input_vals as $key => $val) {
+    if (strpos($key, 'segment_') === 0 && !empty($val)) {
+      $bid_seg = explode(';', str_replace('segment_', '', $key));
+
+      if (count($bid_seg) > 1) {
+        $bid = $bid_seg[0];
+        $segment = trim($bid_seg[1]);
+
+        _ss_contextual_blocks_upsert_block($bid, $segment, $val);
+
+      }
+
+    }
+  }
 
 }
 
@@ -170,4 +185,45 @@ function _ss_contextual_blocks_return_all_blocks() {
     ->fetchAllKeyed();
 
   return $ss_blocks;
+}
+
+/**
+ * Inserts or Updates a SS contextual block configuration.
+ *
+ * @param int $ss_bid
+ *   Integer value of SharpSpring block
+ * @param string $segment
+ *   SharpSpring segment name
+ * @param int $block_id
+ *   Integer value of drupal block
+ *
+ * @throws \Exception
+ */
+function _ss_contextual_blocks_upsert_block($ss_bid, $segment, $block_id) {
+  $exists = db_select('sharpspring_contextual_block_data', 'sbd')
+    ->fields('sbd')
+    ->condition('ss_bid', $ss_bid)
+    ->condition('segment', $segment)
+    ->execute()
+    ->fetchCol();
+
+  if (empty($exists)) {
+    db_insert('sharpspring_contextual_block_data')
+      ->fields(array(
+        'ss_bid' => $ss_bid,
+        'segment' => $segment,
+        'block_id' => $block_id,
+      ))
+      ->execute();
+  }
+  else {
+    db_update('sharpspring_contextual_block_data')
+      ->fields(array(
+        'block_id' => $block_id,
+      ))
+      ->condition('ss_bid', $ss_bid)
+      ->condition('segment', $segment)
+      ->execute();
+  }
+
 }
