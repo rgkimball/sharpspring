@@ -2,5 +2,5 @@ name = SharpSpring
 author = "Elevated Third"
 description = Allows your site to generate sales leads in SharpSpring by adding a Javascript tracking code to every page.
 core = 7.x
-package = Statistics
+package = Sharpspring
 configure = admin/config/system/sharpspring

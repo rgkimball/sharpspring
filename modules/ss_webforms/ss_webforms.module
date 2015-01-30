@@ -10,6 +10,23 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function ss_webforms_menu() {
+  $items['admin/config/system/sharpspring/webforms'] = array(
+    'title' => 'Webforms',
+    'description' => 'Configure SharpSpring Webform tracking.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_webforms_config_form'),
+    'access arguments' => array('administer sharpspring'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_form_alter().
  *
  * Adds sharpspring tracking javascript to selected webforms.
@@ -67,12 +84,14 @@ function ss_webforms_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Defines the SharpSpring Webform configuration form.
  *
- * Adds webform config to sharpspring config page.
+ * @param array $form
+ *   An array defining the form.
+ * @param array $form_state
+ *   An array defining the current state of the form.
  */
-function ss_webforms_form_sharpspring_admin_config_form_alter(&$form, &$form_state, $form_id) {
-
+function ss_webforms_config_form($form, &$form_state) {
   $form['tracking']['webforms'] = array(
     '#title' => t('Webform Lead Generation'),
     '#description' => t("<p>Add unique tracking IDs to each webform on the site. For each webform you want to track, enter the form's endpoint ID as it appears in the unique tracking code. It should be formatted like xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx (8-4-4-4-12).</p>"),
@@ -168,18 +187,18 @@ function ss_webforms_form_sharpspring_admin_config_form_alter(&$form, &$form_sta
     '#default_value' => $forms_count,
   );
 
-  $form['#validate'][]  = 'ss_webforms_admin_form_validate';
+  return system_settings_form($form);
 }
 
 /**
- * Webform admin form validation.
+ * SharpSpring Webform admin form validation.
  *
  * @param array $form
  *   An array defining the form.
  * @param array $form_state
  *   An array defining the current state of the form.
  */
-function ss_webforms_admin_form_validate(&$form, &$form_state) {
+function ss_webforms_config_form_validate(&$form, &$form_state) {
   // Only get numeric array keys within webforms group (i.e. webform nids).
   $keys = array_filter(array_keys($form['tracking']['webforms']), 'is_int');
 

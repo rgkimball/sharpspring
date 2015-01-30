@@ -1,0 +1,75 @@
+<?php
+/**
+ * @file
+ * Installation file for SharpSpring contextual blocks
+ *
+ * @author: Mojiferous
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function ss_contextual_blocks_uninstall() {
+  if (db_table_exists('sharpspring_contextual_blocks')) {
+    db_query('DROP TABLE {sharpspring_contextual_blocks}');
+  }
+  if (db_table_exists('sharpspring_contextual_block_data')) {
+    db_query('DROP TABLE {sharpspring_contextual_block_data}');
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function ss_contextual_blocks_schema() {
+  $schema['sharpspring_contextual_blocks'] = array(
+    'description' => 'Stores SharpSpring contextual block definitions',
+    'fields' => array(
+      'ss_bid' => array(
+        'type' => 'serial',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'description' => 'SharpSpring Contextual Block internal ID',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'Contextual Block name',
+      ),
+    ),
+    'indexes' => array(
+      'ss_bid' => array('ss_bid'),
+    ),
+    'primary keys' => array(
+      'ss_bid' => array('ss_bid'),
+    ),
+  );
+
+  $schema['sharpspring_contextual_block_data'] = array(
+    'description' => 'Stores SharpSpring contextual block data',
+    'fields' => array(
+      'ss_bid' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'description' => 'SharpSpring Contextual Block internal ID',
+      ),
+      'segment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'description' => 'SharpSpring segment name',
+      ),
+      'block_id' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'description' => 'Block id',
+      ),
+    ),
+    'indexes' => array(
+      'ss_bid' => array('ss_bid'),
+    ),
+  );
+
+  return $schema;
+}

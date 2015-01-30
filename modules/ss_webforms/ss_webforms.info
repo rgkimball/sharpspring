@@ -2,7 +2,8 @@ name = SharpSpring Webforms
 author = "Elevated Third"
 description = Adds SharpSpring tracking to admin selected webforms.
 core = 7.x
-package = Statistics
+package = Sharpspring
 configure = admin/config/system/sharpspring
 
 dependencies[] = webform
+dependencies[] = sharpspring

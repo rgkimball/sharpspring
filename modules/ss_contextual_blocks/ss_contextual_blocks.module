@@ -1,0 +1,63 @@
+<?php
+/**
+ * @file
+ * Drupal Module: SharpSpring Contextual Blocks.
+ *
+ * Provides contextual content blocks that respond
+ * to SharpSpring lead or contact fields.
+ *
+ * @author: mojiferous
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ss_contextual_blocks_menu() {
+  $items['admin/config/system/sharpspring/blocks'] = array(
+    'title' => 'Contextual Blocks',
+    'description' => 'Configure SharpSpring contextual content blocks.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_config_form'),
+    'access arguments' => array('administer sharpspring'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  return $items;
+}
+
+/**
+ * Defines the block config form.
+ *
+ * @param array $form
+ *   An array containing form values
+ * @param array $form_state
+ *   An array containing current form state values
+ *
+ * @return array
+ *   The final form array
+ */
+function ss_contextual_blocks_config_form($form, &$form_state) {
+  // Replace Windows line endings.
+  $raw_segments = str_replace("\n\r", "\n", variable_get('sharpspring_segment_values'));
+  $segments = explode("\n", $raw_segments);
+
+  // Get a list of all active blocks.
+  global $theme;
+  $blocks = db_query("SELECT bid, delta FROM {block} WHERE theme = :theme", array(':theme' => $theme))->fetchAllKeyed();
+
+  $n = 0;
+  foreach ($segments as $segment) {
+    $form['segment_' . $n] = array(
+      '#type' => 'select',
+      '#title' => $segment,
+      '#options' => $blocks,
+      '#empty_value' => '',
+      '#default_value' => 0,
+    );
+
+    $n++;
+  }
+
+  return system_settings_form($form);
+}

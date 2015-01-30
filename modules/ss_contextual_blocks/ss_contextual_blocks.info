@@ -1,0 +1,8 @@
+name = SharpSpring Contextual Blocks
+author = "Elevated Third"
+description = Changes block content based on SharpSpring data.
+core = 7.x
+package = Sharpspring
+configure = admin/config/system/sharpspring/contextual_blocks
+
+dependencies[] = sharpspring
