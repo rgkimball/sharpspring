@@ -6,7 +6,7 @@
  */
 
 /**
- * Handles sharpspring response
+ * Handles sharpspring response.
  *
  * @param resp
  *   response object returned from Sharpspring

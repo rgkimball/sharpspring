@@ -32,7 +32,51 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['sharspring/contextual/block_callback/%/%'] = array(
+    'title' => 'Return block contents',
+    'page callback' => 'ss_contextual_blocks_callback',
+    'page arguments' => array(3,4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
+}
+
+/**
+ * Returns a drupal block depending on sharpspring block and segment.
+ *
+ * @param int $bid
+ *   An integer indicating the internal sharpspring block id.
+ * @param string $segment
+ *   The name of the sharpspring segment
+ */
+function ss_contextual_blocks_callback($bid, $segment) {
+  $ret_val = '';
+
+  $block_id = db_select('sharpspring_contextual_block_data', 'sbd')
+    ->fields('sbd', array('block_id'))
+    ->condition('ss_bid', $bid)
+    ->condition('segment', $segment)
+    ->execute()
+    ->fetchField();
+
+  if (!empty($block_id)) {
+
+    $block_info = db_select('block', 'b')
+      ->fields('b', array('module', 'delta'))
+      ->condition('bid', $block_id)
+      ->execute()
+      ->fetchAssoc();
+
+    if (!empty($block_info['module']) && !empty($block_info['delta'])) {
+      $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
+      $ret_val = render($block);
+    }
+
+  }
+
+  drupal_json_output($ret_val);
 }
 
 /**
@@ -51,7 +95,8 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
   $raw_segments = str_replace("\n\r", "\n", variable_get('sharpspring_segment_values'));
   $segments = explode("\n", $raw_segments);
 
-  $ss_blocks = _ss_contextual_blocks_return_all_blocks();
+  $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
+  $contents = ss_contextual_blocks_return_all_ss_blocks();
 
   // Get a list of all active blocks.
   global $theme;
@@ -69,12 +114,17 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
 
     $n = 0;
     foreach ($segments as $segment) {
-      $form['ss_block_' . $bid]['segment_' . $bid . ';' . $segment] = array(
+      $default_val = 0;
+      if (!empty($contents[$bid]) && !empty($contents[$bid][trim($segment)])) {
+        $default_val = $contents[$bid][trim($segment)];
+      }
+
+      $form['ss_block_' . $bid]['segment_' . $bid . ';' . trim($segment)] = array(
         '#type' => 'select',
-        '#title' => $segment,
+        '#title' => trim($segment),
         '#options' => $blocks,
         '#empty_value' => '',
-        '#default_value' => 0,
+        '#default_value' => $default_val,
       );
 
       $n++;
@@ -102,7 +152,7 @@ function ss_contextual_blocks_config_form_submit($form, &$form_state) {
   $input_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
 
   foreach ($input_vals as $key => $val) {
-    if (strpos($key, 'segment_') === 0 && !empty($val)) {
+    if (strpos($key, 'segment_') === 0) {
       $bid_seg = explode(';', str_replace('segment_', '', $key));
 
       if (count($bid_seg) > 1) {
@@ -115,6 +165,8 @@ function ss_contextual_blocks_config_form_submit($form, &$form_state) {
 
     }
   }
+
+  drupal_set_message('SharpSpring Contextual Blocks saved');
 
 }
 
@@ -175,16 +227,42 @@ function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
 /**
  * Helper function to return all SS Contextual Blocks keyed by block id.
  *
+ * This function returns blocks that are available within the
+ * standard Drupal block system. The contents are defined elsewhere.
+ *
  * @return array
  *   Returns array keyed by block id, values are block names.
  */
-function _ss_contextual_blocks_return_all_blocks() {
+function _ss_contextual_blocks_return_all_drupal_blocks() {
   $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
     ->fields('scb')
     ->execute()
     ->fetchAllKeyed();
 
   return $ss_blocks;
+}
+
+/**
+ * Helper function to return contextual contents of SharpSpring blocks.
+ *
+ * @return array
+ *   Returns array of block contexts keyed by ss block id.
+ */
+function ss_contextual_blocks_return_all_ss_blocks() {
+  $ret_val = array();
+
+  $ss_blocks = db_select('sharpspring_contextual_block_data', 'sbd')
+    ->fields('sbd')
+    ->execute()
+    ->fetchAll();
+
+  foreach ($ss_blocks as $block_info) {
+    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id)) {
+      $ret_val[$block_info->ss_bid][$block_info->segment] = $block_info->block_id;
+    }
+  }
+
+  return $ret_val;
 }
 
 /**
@@ -226,4 +304,58 @@ function _ss_contextual_blocks_upsert_block($ss_bid, $segment, $block_id) {
       ->execute();
   }
 
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function ss_contextual_blocks_block_info() {
+  $blocks = array();
+  $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
+
+  foreach ($ss_blocks as $bid => $name) {
+    $blocks['ss_contextual_block_' . $bid] = array(
+      'info' => $name,
+      'cache' => DRUPAL_CACHE_PER_ROLE,
+    );
+  }
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function ss_contextual_blocks_block_view($delta = '') {
+  $block = array();
+
+  if (strpos($delta, 'ss_contextual_block_') === 0) {
+    // This is a SharpSpring contextual block.
+
+    $bid = str_replace('ss_contextual_block_', '', $delta);
+
+    $block['subject'] = '';
+    $block['content'] = _ss_contextual_blocks_return_block_contents($bid);
+  }
+
+  return $block;
+}
+
+/**
+ * Returns the contents of a SharpSpring contextual block.
+ *
+ * @param int $bid
+ *   An integer representing the SharpSpring block.
+ *
+ * @return string
+ *   The contents of the block.
+ */
+function _ss_contextual_blocks_return_block_contents($bid) {
+  // Add javascript to handle Sharpspring callback.
+  $path = drupal_get_path('module', 'ss_contextual_blocks');
+  drupal_add_js($path . '/js/ss_contextual_blocks.js');
+
+  drupal_add_js(array('sharpspring' => array('calledFuncs' => array('ssContextualBlock'))), 'setting');
+
+  return '<div id="ss-contextual-block-' . $bid . '" class="ss-contextual-wrapper" ssbid="' . $bid . '"></div>';
 }
