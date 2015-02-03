@@ -39,29 +39,6 @@ function sharpspring_admin_config_form($form_state) {
     '#markup' => t('For more information on how to find and set these values please see <a href="http://help.sharpspring.com/customer/portal/articles/1497453-how-to-insert-sharpspring-tracking-code-how-to-add-additional-sites" target="_blank">http://help.sharpspring.com/customer/portal/articles/1497453-how-to-insert-sharpspring-tracking-code-how-to-add-additional-sites</a>'),
   );
 
-  $form['segmentation'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Segmentation Settings'),
-  );
-
-  $form['segmentation']['sharpspring_segment_field']  = array(
-    '#title' => t('Custom Segmentation Field'),
-    '#type' => 'textfield',
-    '#default_value' => variable_get('sharpspring_segment_field'),
-    '#description' => t('This is a user-defined custom field used to define contact or lead segmentation. Enter the field name exactly as entered on the custom field addition screen, including spaces and special characters.'),
-  );
-
-  $form['segmentation']['sharpspring_segment_values'] = array(
-    '#title' => t('Custom Segmentation Field Values'),
-    '#type' => 'textarea',
-    '#default_value' => variable_get('sharpspring_segment_values'),
-    '#description' => t('List of possible custom segmentation field values. Enter one value per line.'),
-  );
-
-  $form['tracking'] = array(
-    '#type' => 'vertical_tabs',
-  );
-
   return system_settings_form($form);
 }
 
