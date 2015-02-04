@@ -48,6 +48,12 @@ function ss_contextual_blocks_schema() {
   $schema['sharpspring_contextual_block_data'] = array(
     'description' => 'Stores SharpSpring contextual block data',
     'fields' => array(
+      'data_id' => array(
+        'type' => 'serial',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'description' => 'Contextual Rule ID',
+      ),
       'ss_bid' => array(
         'type' => 'int',
         'size' => 'normal',
@@ -55,12 +61,12 @@ function ss_contextual_blocks_schema() {
         'description' => 'SharpSpring Contextual Block internal ID',
       ),
       'segment' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'text',
+        'size' => 'normal',
         'description' => 'SharpSpring segment name',
       ),
       'block_id' => array(
-        'type' => 'text',
+        'type' => 'int',
         'size' => 'normal',
         'not null' => TRUE,
         'description' => 'Block id',

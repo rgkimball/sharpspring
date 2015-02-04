@@ -26,16 +26,7 @@ function ss_contextual_blocks_menu() {
     'weight' => 10,
   );
 
-  $items['admin/content/add_ss_block'] = array(
-    'title' => 'Add SharpSpring Block',
-    'description' => 'Add a SharpSpring contextual block.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_add_block_form'),
-    'access arguments' => array('administer sharpspring'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-
-  $items['sharspring/contextual/block_callback/%/%'] = array(
+  $items['sharpspring/contextual/block_callback/%/%'] = array(
     'title' => 'Return block contents',
     'page callback' => 'ss_contextual_blocks_callback',
     'page arguments' => array(3,4),
@@ -83,60 +74,6 @@ function ss_contextual_blocks_callback($bid, $segment) {
 }
 
 /**
- * Provides the Add SharpSpring Block form.
- *
- * @param array $form
- *   An array of from values.
- * @param array $form_state
- *   An array representing the current form state.
- *
- * @return array
- *   Returns form array.
- */
-function ss_contextual_blocks_add_block_form($form, &$form_state) {
-  $form['title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Title'),
-    '#required' => TRUE,
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add Block'),
-  );
-
-  return $form;
-}
-
-/**
- * Submit handler for the add block form.
- *
- * @param array $form
- *   An array representing the current form.
- * @param array $form_state
- *   An array representing the current form contents.
- *
- * @throws \Exception
- */
-function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
-  if (!empty($form_state['input']['title'])) {
-    $title = $form_state['input']['title'];
-
-    $new_bid = db_insert('sharpspring_contextual_blocks')
-      ->fields(array(
-        'name' => $title,
-      ))
-      ->execute();
-
-    drupal_set_message('SharpSpring Contextual Block "' . $title . '" Added.');
-  }
-  else {
-    drupal_set_message('Unable to add SharpSpring Block, no title found.');
-    watchdog('SharpSpring Blocks', 'Unable to add SharpSpring block, no title passed to form submit.', array(), WATCHDOG_ERROR);
-  }
-}
-
-/**
  * Helper function to return all SS Contextual Blocks keyed by block id.
  *
  * This function returns blocks that are available within the
@@ -163,14 +100,17 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
 function _ss_contextual_blocks_return_all_ss_blocks() {
   $ret_val = array();
 
-  $ss_blocks = db_select('sharpspring_contextual_block_data', 'sbd')
-    ->fields('sbd')
-    ->execute()
-    ->fetchAll();
+  $ss_blocks = db_query("SELECT sbd.ss_bid, sbd.segment, sbd.block_id, sbd.data_id, scb.name FROM {sharpspring_contextual_block_data} sbd JOIN {sharpspring_contextual_blocks} scb ON sbd.ss_bid = scb.ss_bid")->fetchAll();
 
   foreach ($ss_blocks as $block_info) {
-    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id)) {
-      $ret_val[$block_info->ss_bid][$block_info->segment] = $block_info->block_id;
+    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id)) {
+      $ret_val[] = array(
+        'ss_bid' => $block_info->ss_bid,
+        'block_id' => $block_info->block_id,
+        'name' => $block_info->name,
+        'data_id' => $block_info->data_id,
+        'segment' => json_decode($block_info->segment, TRUE),
+      );
     }
   }
 
