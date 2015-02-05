@@ -23,7 +23,7 @@ function ssContextualBlock(resp) {
         // Perform an ajax call to get the block contents
         var request = $.ajax({
           type: "POST",
-          url: "sharpspring/contextual/block_callback/" + this_bid + "/" + segmentVal,
+          url: "/sharpspring/contextual/block_callback/" + this_bid + "/" + segmentVal,
           ss_wrapper: this,
           success: function(data, text_status) {
             $(this.ss_wrapper).html(data);

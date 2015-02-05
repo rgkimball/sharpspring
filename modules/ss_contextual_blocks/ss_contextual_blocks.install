@@ -13,8 +13,8 @@ function ss_contextual_blocks_uninstall() {
   if (db_table_exists('sharpspring_contextual_blocks')) {
     db_query('DROP TABLE {sharpspring_contextual_blocks}');
   }
-  if (db_table_exists('sharpspring_contextual_block_data')) {
-    db_query('DROP TABLE {sharpspring_contextual_block_data}');
+  if (db_table_exists('sharpspring_contextual_block_rules')) {
+    db_query('DROP TABLE {sharpspring_contextual_block_rules}');
   }
 }
 
@@ -45,8 +45,8 @@ function ss_contextual_blocks_schema() {
     ),
   );
 
-  $schema['sharpspring_contextual_block_data'] = array(
-    'description' => 'Stores SharpSpring contextual block data',
+  $schema['sharpspring_contextual_block_rules'] = array(
+    'description' => 'Stores SharpSpring contextual block rules',
     'fields' => array(
       'data_id' => array(
         'type' => 'serial',
@@ -70,6 +70,13 @@ function ss_contextual_blocks_schema() {
         'size' => 'normal',
         'not null' => TRUE,
         'description' => 'Block id',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Rule weight',
       ),
     ),
     'indexes' => array(

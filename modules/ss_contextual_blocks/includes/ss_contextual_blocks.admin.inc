@@ -18,54 +18,161 @@
  *   The final form array
  */
 function ss_contextual_blocks_config_form($form, &$form_state) {
-  $form['add_block'] = array(
+  $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
+
+  $form['block_table'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'SharpSpring Contextual Blocks',
+  );
+
+  $form['block_table']['add_block'] = array(
     '#type' => 'fieldset',
     '#title' => t('Add new SharpSpring Block'),
   );
-
-  $form['add_block']['new_block_name'] = array(
+  $form['block_table']['add_block']['new_block_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Block Name'),
     '#maxlength' => 128,
   );
-
-  $form['add_block']['block_submit'] = array(
+  $form['block_table']['add_block']['block_submit'] = array(
     '#type' => 'submit',
     '#value' => 'Add Block',
   );
 
-  // Replace Windows line endings.
-  $raw_segments = str_replace("\n\r", "\n", variable_get('sharpspring_segment_values'));
-  $segments = explode("\n", $raw_segments);
+  $rows = array();
 
-  // $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
-  $contents = _ss_contextual_blocks_return_all_ss_blocks();
+  // Format block table rows.
+  foreach ($ss_blocks as $bid => $block) {
+    // Build the table rows.
+    $rows[$bid] = array(
+      'data' => array(
+        // Name and Segment columns.
+        check_plain($block),
+        // Operations.
+        array(
+          'data' => array(
+            '#theme' => 'link',
+            '#text' => t('delete'),
+            '#path' => 'admin/sharpspring/contextual/delete_block/' . $bid,
+            '#options' => array('attributes' => array(), 'html' => FALSE),
+          ),
+        ),
+      ),
+    );
 
-  $header = array(
-    array('data' => 'SharpSpring Block', 'field' => 'name', 'sort' => 'ASC'),
-    array('data' => 'Segmentation Name', 'field' => 'segment', 'sort' => 'ASC'),
-    array('data' => 'Operations'),
+  }
+
+  // Add the table to the form.
+  $form['block_table']['data_table']['table'] = array(
+    '#theme' => 'table',
+    '#header' => array(
+      // We need two empty columns for the weigth field and the cross.
+      t('Sharpspring Block'),
+      t('Operations'),
+    ),
+    '#rows' => $rows,
+    '#empty' => t('There are no entries available.'),
+    '#attributes' => array('id' => 'entry-order'),
   );
 
+  $form['rules_table'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'SharpSpring Contextual Rules',
+  );
+
+  $form['rules_table']['actions'] = array(
+    '#type' => 'actions',
+  );
+  $form['rules_table']['actions']['new_rule'] = array(
+    '#markup' => l(t('Add Rule'), 'sharpspring/contextual/add'),
+  );
+
+  // Load the custom rules.
+  $contents = _ss_contextual_blocks_return_all_ss_blocks();
+
   $rows = array();
+  $row_elements = array();
+
+  // Format custom rule table rows.
   foreach ($contents as $block) {
     $name = (!empty($block['name'])) ? $block['name'] : '';
     $segment = (!empty($block['segment']['name'])) ? $block['segment']['name'] : '';
+    $weight = (!empty($block['weight'])) ? $block['weight'] : 0;
 
     if (!empty($block['data_id'])) {
-      $rows[] = array(
-        $name,
-        $segment,
-        '<ul class="links inline"><li class="edit first"><a href="/sharpspring/contextual/edit/' . $block['data_id'] . '">edit</a></li><li class="delete last"><a href="/sharpspring/contextual/delete/' . $block['data_id'] . '">delete</a></li></ul>',
+      $id = $block['data_id'];
+      // Build the table rows.
+      $rows[$id] = array(
+        'data' => array(
+          // Cell for the cross drag&drop element.
+          array('class' => array('entry-cross')),
+          // Weight item for the tabledrag.
+          array(
+            'data' => array(
+              '#type' => 'weight',
+              '#title' => t('Weight'),
+              '#title_display' => 'invisible',
+              '#default_value' => $weight,
+              '#parents' => array('data_table', $id, 'weight'),
+              '#attributes' => array(
+                'class' => array('entry-order-weight'),
+              ),
+            ),
+          ),
+          // Name and Segment columns.
+          check_plain($name),
+          check_plain($segment),
+          // Operations.
+          array(
+            'data' => array(
+              '#theme' => 'link',
+              '#text' => t('edit'),
+              '#path' => 'admin/sharpspring/contextual/edit/' . $block['data_id'],
+              '#options' => array('attributes' => array(), 'html' => FALSE),
+            ),
+          ),
+          array(
+            'data' => array(
+              '#theme' => 'link',
+              '#text' => t('delete'),
+              '#path' => 'admin/sharpspring/contextual/delete/' . $block['data_id'],
+              '#options' => array('attributes' => array(), 'html' => FALSE),
+            ),
+          ),
+        ),
+        'class' => array('draggable'),
+      );
+      // Build rows of the form elements in the table.
+      $row_elements[$id] = array(
+        'weight' => &$rows[$id]['data'][1]['data'],
       );
     }
 
   }
 
-  $form['block_table'] = array(
-    '#markup' => theme('table', array('header' => $header, 'rows' => $rows)),
+  // Add the table to the form.
+  $form['rules_table']['data_table']['table'] = array(
+    '#theme' => 'table',
+    // The row form elements need to be processed and build,
+    // therefore pass them as element children.
+    'elements' => $row_elements,
+    '#header' => array(
+      // We need two empty columns for the weigth field and the cross.
+      array('data' => NULL, 'colspan' => 2),
+      t('Sharpspring Block'),
+      t('Segmentation Name'),
+      array('data' => t('Operations'), 'colspan' => 2),
+    ),
+    '#rows' => $rows,
+    '#empty' => t('There are no entries available.'),
+    '#attributes' => array('id' => 'entry-order'),
   );
+  drupal_add_tabledrag('entry-order', 'order', 'sibling', 'entry-order-weight');
 
+  $form['rules_table']['save_table'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Rule Weights'),
+  );
   // Get a list of all active blocks.
   // global $theme;
   // $blocks = db_select('block', 'b')
@@ -115,18 +222,9 @@ function ss_contextual_blocks_config_form_submit($form, &$form_state) {
   // First save the existing block information.
   $input_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
 
-  foreach ($input_vals as $key => $val) {
-    if (strpos($key, 'segment_') === 0) {
-      $bid_seg = explode(';', str_replace('segment_', '', $key));
-
-      if (count($bid_seg) > 1) {
-        $bid = $bid_seg[0];
-        $segment = trim($bid_seg[1]);
-
-        _ss_contextual_blocks_upsert_block($bid, $segment, $val);
-
-      }
-
+  if (!empty($input_vals['data_table'])) {
+    foreach ($input_vals['data_table'] as $data_id => $value) {
+      _ss_contextual_blocks_update_rule_weight($data_id, $value);
     }
   }
 

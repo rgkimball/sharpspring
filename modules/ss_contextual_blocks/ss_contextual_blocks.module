@@ -28,10 +28,41 @@ function ss_contextual_blocks_menu() {
 
   $items['sharpspring/contextual/block_callback/%/%'] = array(
     'title' => 'Return block contents',
+    'description' => 'Returns the contents of a SharpSpring contextual block',
     'page callback' => 'ss_contextual_blocks_callback',
     'page arguments' => array(3,4),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
+  );
+
+  $items['admin/sharpspring/contextual/add'] = array(
+    'title' => 'Add new SharpSpring contextual rule',
+    'description' => 'Provides a form to add a new SharpSpring contextual rule',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_add_rule_form'),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/sharpspring/contextual/delete/%'] = array(
+    'title' => 'Delete SharpSpring contextual rule',
+    'description' => 'Provides a form to confirm deletion of a SharpSpring contextual rule',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_delete_rule_form', 4),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/sharpspring/contextual/edit/%'] = array(
+    'title' => 'Edit SharpSpring contextual rule',
+    'description' => 'Provides a form to edit a SharpSpring contextual rule',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_edit_rule_form', 4),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
@@ -48,7 +79,7 @@ function ss_contextual_blocks_menu() {
 function ss_contextual_blocks_callback($bid, $segment) {
   $ret_val = '';
 
-  $block_id = db_select('sharpspring_contextual_block_data', 'sbd')
+  $block_id = db_select('sharpspring_contextual_block_rules', 'sbd')
     ->fields('sbd', array('block_id'))
     ->condition('ss_bid', $bid)
     ->condition('segment', $segment)
@@ -100,15 +131,16 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
 function _ss_contextual_blocks_return_all_ss_blocks() {
   $ret_val = array();
 
-  $ss_blocks = db_query("SELECT sbd.ss_bid, sbd.segment, sbd.block_id, sbd.data_id, scb.name FROM {sharpspring_contextual_block_data} sbd JOIN {sharpspring_contextual_blocks} scb ON sbd.ss_bid = scb.ss_bid")->fetchAll();
+  $ss_blocks = db_query("SELECT sbd.ss_bid, sbd.segment, sbd.block_id, sbd.data_id, sbd.weight, scb.name FROM {sharpspring_contextual_block_rules} sbd JOIN {sharpspring_contextual_blocks} scb ON sbd.ss_bid = scb.ss_bid ORDER BY sbd.weight")->fetchAll();
 
   foreach ($ss_blocks as $block_info) {
-    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id)) {
+    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id) && isset($block_info->weight)) {
       $ret_val[] = array(
         'ss_bid' => $block_info->ss_bid,
         'block_id' => $block_info->block_id,
         'name' => $block_info->name,
         'data_id' => $block_info->data_id,
+        'weight' => $block_info->weight,
         'segment' => json_decode($block_info->segment, TRUE),
       );
     }
@@ -130,15 +162,15 @@ function _ss_contextual_blocks_return_all_ss_blocks() {
  * @throws \Exception
  */
 function _ss_contextual_blocks_upsert_block($ss_bid, $segment, $block_id) {
-  $exists = db_select('sharpspring_contextual_block_data', 'sbd')
-    ->fields('sbd')
+  $exists = db_select('sharpspring_contextual_block_rules', 'sbr')
+    ->fields('sbr')
     ->condition('ss_bid', $ss_bid)
     ->condition('segment', $segment)
     ->execute()
     ->fetchCol();
 
   if (empty($exists)) {
-    db_insert('sharpspring_contextual_block_data')
+    db_insert('sharpspring_contextual_block_rules')
       ->fields(array(
         'ss_bid' => $ss_bid,
         'segment' => $segment,
@@ -147,7 +179,7 @@ function _ss_contextual_blocks_upsert_block($ss_bid, $segment, $block_id) {
       ->execute();
   }
   else {
-    db_update('sharpspring_contextual_block_data')
+    db_update('sharpspring_contextual_block_rules')
       ->fields(array(
         'block_id' => $block_id,
       ))
@@ -155,5 +187,23 @@ function _ss_contextual_blocks_upsert_block($ss_bid, $segment, $block_id) {
       ->condition('segment', $segment)
       ->execute();
   }
+
+}
+
+/**
+ * Updates a contextual block rule weight.
+ *
+ * @param int $data_id
+ *   Integer of internal rule ID.
+ * @param int $weight
+ *   Integer Value of new rule weight.
+ */
+function _ss_contextual_blocks_update_rule_weight($data_id, $weight) {
+  db_update('sharpspring_contextual_block_rules')
+    ->fields(array(
+      'weight' => $weight,
+    ))
+    ->condition('data_id', $data_id)
+    ->execute();
 
 }
