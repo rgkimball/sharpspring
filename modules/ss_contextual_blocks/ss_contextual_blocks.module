@@ -35,7 +35,7 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/sharpspring/contextual/add'] = array(
+  $items['admin/config/system/sharpspring/blocks/add'] = array(
     'title' => 'Add new SharpSpring contextual rule',
     'description' => 'Provides a form to add a new SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
@@ -45,21 +45,31 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/sharpspring/contextual/delete/%'] = array(
+  $items['admin/config/system/sharpspring/blocks/delete/%'] = array(
     'title' => 'Delete SharpSpring contextual rule',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_delete_rule_form', 4),
+    'page arguments' => array('ss_contextual_blocks_delete_rule_form', 6),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/sharpspring/contextual/edit/%'] = array(
+  $items['admin/config/system/sharpspring/blocks/edit/%'] = array(
     'title' => 'Edit SharpSpring contextual rule',
     'description' => 'Provides a form to edit a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_edit_rule_form', 4),
+    'page arguments' => array('ss_contextual_blocks_edit_rule_form', 6),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/config/system/sharpspring/blocks/delete_block/%'] = array(
+    'title' => 'Delete SharpSpring contextual block',
+    'description' => 'Provides a form to confirm deletion of a SharpSpring contextual block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_delete_block_form', 6),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -123,22 +133,39 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
 }
 
 /**
- * Helper function to return contextual contents of SharpSpring blocks.
+ * Helper function to return SharpSpring contextual rules.
  *
  * @return array
  *   Returns array of block contexts keyed by ss block id.
  */
-function _ss_contextual_blocks_return_all_ss_blocks() {
+function _ss_contextual_blocks_return_all_ss_rules() {
   $ret_val = array();
 
-  $ss_blocks = db_query("SELECT sbd.ss_bid, sbd.segment, sbd.block_id, sbd.data_id, sbd.weight, scb.name FROM {sharpspring_contextual_block_rules} sbd JOIN {sharpspring_contextual_blocks} scb ON sbd.ss_bid = scb.ss_bid ORDER BY sbd.weight")->fetchAll();
+  $ss_blocks = db_select('sharpspring_contextual_block_rules', 'sbr');
+  $ss_blocks->join('sharpspring_contextual_blocks', 'scb', 'sbr.ss_bid = scb.ss_bid');
+  $ss_blocks
+    ->fields('sbr',
+      array(
+        'ss_bid',
+        'segment',
+        'block_id',
+        'data_id',
+        'weight',
+        'machine_name',
+      )
+    )
+    ->fields('scb', array('name'))
+    ->orderBy('sbr.weight');
 
-  foreach ($ss_blocks as $block_info) {
-    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id) && isset($block_info->weight)) {
+  $result = $ss_blocks->execute()->fetchAll();
+
+  foreach ($result as $block_info) {
+    if (!empty($block_info->ss_bid) && !empty($block_info->segment) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id) && isset($block_info->weight) && !empty($block_info->machine_name)) {
       $ret_val[] = array(
         'ss_bid' => $block_info->ss_bid,
         'block_id' => $block_info->block_id,
-        'name' => $block_info->name,
+        'block_name' => $block_info->name,
+        'machine_name' => $block_info->machine_name,
         'data_id' => $block_info->data_id,
         'weight' => $block_info->weight,
         'segment' => json_decode($block_info->segment, TRUE),
@@ -206,4 +233,23 @@ function _ss_contextual_blocks_update_rule_weight($data_id, $weight) {
     ->condition('data_id', $data_id)
     ->execute();
 
+}
+
+/**
+ * Validates SharpSpring rule machine names, checks for duplicates.
+ *
+ * @param string $machine_name
+ *   String passed from the rule name field.
+ *
+ * @return bool
+ *   Returns true if the machine name is already in use.
+ */
+function _ss_contextual_block_rule_name_exists($machine_name) {
+  $exists = db_select('sharpspring_contextual_block_rules', 'sbr')
+    ->fields('sbr')
+    ->condition('machine_name', $machine_name)
+    ->execute()
+    ->fetchCol();
+
+  return !empty($exists);
 }

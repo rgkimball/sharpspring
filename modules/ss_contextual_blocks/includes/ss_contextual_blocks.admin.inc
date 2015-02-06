@@ -53,7 +53,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
           'data' => array(
             '#theme' => 'link',
             '#text' => t('delete'),
-            '#path' => 'admin/sharpspring/contextual/delete_block/' . $bid,
+            '#path' => 'admin/config/system/sharpspring/blocks/delete_block/' . $bid,
             '#options' => array('attributes' => array(), 'html' => FALSE),
           ),
         ),
@@ -71,8 +71,8 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
       t('Operations'),
     ),
     '#rows' => $rows,
-    '#empty' => t('There are no entries available.'),
-    '#attributes' => array('id' => 'entry-order'),
+    '#empty' => t('There are no blocks available.'),
+    '#attributes' => array('id' => 'ss-block-order'),
   );
 
   $form['rules_table'] = array(
@@ -84,19 +84,19 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#type' => 'actions',
   );
   $form['rules_table']['actions']['new_rule'] = array(
-    '#markup' => l(t('Add Rule'), 'sharpspring/contextual/add'),
+    '#markup' => l(t('Add Rule'), 'admin/config/system/sharpspring/blocks/add'),
   );
 
   // Load the custom rules.
-  $contents = _ss_contextual_blocks_return_all_ss_blocks();
+  $contents = _ss_contextual_blocks_return_all_ss_rules();
 
   $rows = array();
   $row_elements = array();
 
   // Format custom rule table rows.
   foreach ($contents as $block) {
-    $name = (!empty($block['name'])) ? $block['name'] : '';
-    $segment = (!empty($block['segment']['name'])) ? $block['segment']['name'] : '';
+    $name = (!empty($block['block_name'])) ? $block['block_name'] : '';
+    $segment = (!empty($block['machine_name'])) ? $block['machine_name'] : '';
     $weight = (!empty($block['weight'])) ? $block['weight'] : 0;
 
     if (!empty($block['data_id'])) {
@@ -115,7 +115,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
               '#default_value' => $weight,
               '#parents' => array('data_table', $id, 'weight'),
               '#attributes' => array(
-                'class' => array('entry-order-weight'),
+                'class' => array('rule-order-weight'),
               ),
             ),
           ),
@@ -127,7 +127,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
             'data' => array(
               '#theme' => 'link',
               '#text' => t('edit'),
-              '#path' => 'admin/sharpspring/contextual/edit/' . $block['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/edit/' . $block['data_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
@@ -135,7 +135,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
             'data' => array(
               '#theme' => 'link',
               '#text' => t('delete'),
-              '#path' => 'admin/sharpspring/contextual/delete/' . $block['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/delete/' . $block['data_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
@@ -160,26 +160,19 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
       // We need two empty columns for the weigth field and the cross.
       array('data' => NULL, 'colspan' => 2),
       t('Sharpspring Block'),
-      t('Segmentation Name'),
+      t('Rule Name'),
       array('data' => t('Operations'), 'colspan' => 2),
     ),
     '#rows' => $rows,
-    '#empty' => t('There are no entries available.'),
-    '#attributes' => array('id' => 'entry-order'),
+    '#empty' => t('There are no rules available.'),
+    '#attributes' => array('id' => 'rule-order'),
   );
-  drupal_add_tabledrag('entry-order', 'order', 'sibling', 'entry-order-weight');
+  drupal_add_tabledrag('rule-order', 'order', 'sibling', 'rule-order-weight');
 
   $form['rules_table']['save_table'] = array(
     '#type' => 'submit',
     '#value' => t('Save Rule Weights'),
   );
-  // Get a list of all active blocks.
-  // global $theme;
-  // $blocks = db_select('block', 'b')
-  // ->fields('b', array('bid', 'delta'))
-  // ->condition('theme', $theme)
-  // ->execute()
-  // ->fetchAllKeyed();
 
   return $form;
 }
