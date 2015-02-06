@@ -60,10 +60,10 @@ function ss_contextual_blocks_schema() {
         'not null' => TRUE,
         'description' => 'SharpSpring Contextual Block internal ID',
       ),
-      'segment' => array(
+      'segment_rule' => array(
         'type' => 'text',
         'size' => 'normal',
-        'description' => 'SharpSpring segment name',
+        'description' => 'SharpSpring segment rule',
       ),
       'block_id' => array(
         'type' => 'int',

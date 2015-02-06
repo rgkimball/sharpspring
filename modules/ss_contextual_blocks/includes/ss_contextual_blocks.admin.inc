@@ -46,7 +46,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     // Build the table rows.
     $rows[$bid] = array(
       'data' => array(
-        // Name and Segment columns.
+        // Block name column.
         check_plain($block),
         // Operations.
         array(
@@ -96,7 +96,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
   // Format custom rule table rows.
   foreach ($contents as $block) {
     $name = (!empty($block['block_name'])) ? $block['block_name'] : '';
-    $segment = (!empty($block['machine_name'])) ? $block['machine_name'] : '';
+    $machine_name = (!empty($block['machine_name'])) ? $block['machine_name'] : '';
     $weight = (!empty($block['weight'])) ? $block['weight'] : 0;
 
     if (!empty($block['data_id'])) {
@@ -119,9 +119,9 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
               ),
             ),
           ),
-          // Name and Segment columns.
+          // Name and machine name columns.
           check_plain($name),
-          check_plain($segment),
+          check_plain($machine_name),
           // Operations.
           array(
             'data' => array(

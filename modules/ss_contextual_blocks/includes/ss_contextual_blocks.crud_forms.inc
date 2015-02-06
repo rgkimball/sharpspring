@@ -136,6 +136,27 @@ function ss_contextual_blocks_add_rule_form($form, &$form_state) {
 }
 
 /**
+ * Submit handler for the add rule form.
+ *
+ * @param array $form
+ *   An array of form elements.
+ * @param array $form_state
+ *   An array representing the submitted form state.
+ */
+function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
+  $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $machine_name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
+  $ss_bid = (!empty($new_vals['ss_block'])) ? $new_vals['ss_block'] : 0;
+  $block_id = (!empty($new_vals['drupal_block'])) ? $new_vals['drupal_block'] : 0;
+  $rules = (!empty($new_vals['rules_fieldset'])) ? json_encode($new_vals['rules_fieldset']) : '{}';
+
+  if (!empty($machine_name) && !empty($ss_bid) && !empty($block_id)) {
+    _ss_contextual_blocks_insert_rule($ss_bid, $rules, $block_id, $machine_name);
+    drupal_set_message('SharpSpring rule ' . $machine_name . 'saved.');
+  }
+}
+
+/**
  * Ajax callback for the 'add another rule' button.
  *
  * @param array $form
@@ -209,14 +230,13 @@ function ss_contextual_blocks_add_rule_remove($form, &$form_state) {
  */
 function ss_contextual_blocks_delete_rule_form($form, &$form_state, $data_id) {
   $exists = db_select('sharpspring_contextual_block_rules', 'sbr')
-    ->fields('sbr')
+    ->fields('sbr', array('machine_name'))
     ->condition('data_id', $data_id)
     ->execute()
-    ->fetchCol(1);
+    ->fetchCol();
 
   if (!empty($exists)) {
-    $vals = (!empty($exists[0])) ? json_decode($exists[0]) : array();
-    $rule_name = (!empty($vals->name)) ? $vals->name : '';
+    $rule_name = (!empty($exists[0])) ? $exists[0] : '';
 
     drupal_set_title('Are you sure you want to delete the rule ' . $rule_name . '?');
 
@@ -327,7 +347,7 @@ function ss_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
 
   }
   else {
-    // This rule does not exist, redirect back to the admin page.
+    // This block does not exist, redirect back to the admin page.
     drupal_set_message('Unknown block number, unable to delete.', 'error');
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
@@ -375,5 +395,65 @@ function ss_contextual_blocks_delete_block_form_submit($form, &$form_state) {
  *   The current form.
  */
 function ss_contextual_blocks_edit_rule_form($form, &$form_state, $data_id) {
+  $this_rule = _ss_contextual_blocks_return_rule_from_data_id($data_id);
+
+  if (!empty($this_rule)) {
+    if (empty($form_state['num_rules'])) {
+      // If this is the first load of the form, set up the default rules.
+      $rules = (!empty($this_rule['segment_rule'])) ? json_decode($this_rule['segment_rule'], TRUE) : array();
+
+      if (count($rules) > 0) {
+        $form_state['num_rules'] = count($rules);
+      }
+    }
+
+    _ss_contextual_blocks_set_rule_form($form, $form_state);
+
+    $form['name']['#disabled'] = TRUE;
+    $form['name']['#required'] = FALSE;
+    $form['name']['#default_value'] = (!empty($this_rule['machine_name'])) ? $this_rule['machine_name'] : '';
+
+    $form['ss_block']['#default_value'] = (!empty($this_rule['ss_bid'])) ? $this_rule['ss_bid'] : 0;
+
+    $form['drupal_block']['#default_value'] = (!empty($this_rule['block_id'])) ? $this_rule['block_id'] : 0;
+
+    foreach ($rules as $rule_num => $rule_content) {
+      $form['rules_fieldset'][$rule_num]['fieldname']['#default_value'] = (!empty($rule_content['fieldname'])) ? $rule_content['fieldname'] : '';
+      $form['rules_fieldset'][$rule_num]['value']['#default_value'] = (!empty($rule_content['value'])) ? $rule_content['value'] : '';
+    }
+
+    $form['data_id'] = array(
+      '#type' => 'hidden',
+      '#value' => $data_id,
+    );
+
+  }
+  else {
+    // This rule does not exist, redirect back to the admin page.
+    drupal_set_message('Unknown rule.', 'error');
+    drupal_goto('admin/config/system/sharpspring/blocks');
+  }
+
   return $form;
+}
+
+/**
+ * Handles edit rule form submission.
+ *
+ * @param array $form
+ *   An array of form elements.
+ * @param array $form_state
+ *   An array representing the current form state.
+ */
+function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
+  $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $ss_bid = (!empty($new_vals['ss_block'])) ? $new_vals['ss_block'] : 0;
+  $block_id = (!empty($new_vals['drupal_block'])) ? $new_vals['drupal_block'] : 0;
+  $rules = (!empty($new_vals['rules_fieldset'])) ? json_encode($new_vals['rules_fieldset']) : '{}';
+  $data_id = (!empty($new_vals['data_id'])) ? $new_vals['data_id'] : 0;
+
+  if (!empty($data_id) && !empty($ss_bid) && !empty($block_id)) {
+    _ss_contextual_blocks_update_rule($ss_bid, $rules, $block_id, $data_id);
+    drupal_set_message('SharpSpring rule updated.');
+  }
 }
