@@ -119,14 +119,26 @@ function ss_contextual_blocks_callback($bid) {
 
     if (!empty($block_id)) {
       $block_info = db_select('block', 'b')
-        ->fields('b', array('module', 'delta'))
+        ->fields('b', array('module', 'delta', 'title'))
         ->condition('bid', $block_id)
         ->execute()
         ->fetchAssoc();
 
       if (!empty($block_info['module']) && !empty($block_info['delta'])) {
-        $block = block_load('block', $block_info['delta']);
-        $ret_val = drupal_render(_block_get_renderable_array(_block_render_blocks(array($block))));
+        switch ($block_info['module']) {
+          case 'block':
+            $block = block_load('block', $block_info['delta']);
+            $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
+            $ret_val = drupal_render($render_array);
+            break;
+
+          default:
+            $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
+            if (!empty($block['content'])) {
+              $ret_val = render($block['content']);
+            }
+            break;
+        }
       }
     }
 
@@ -154,7 +166,6 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
   else {
     $ss_blocks = array();
   }
-
 
   return $ss_blocks;
 }

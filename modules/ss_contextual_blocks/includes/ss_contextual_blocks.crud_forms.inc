@@ -152,7 +152,7 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
 
   if (!empty($machine_name) && !empty($ss_bid) && !empty($block_id)) {
     _ss_contextual_blocks_insert_rule($ss_bid, $rules, $block_id, $machine_name);
-    drupal_set_message('SharpSpring rule ' . $machine_name . 'saved.');
+    drupal_set_message('SharpSpring rule ' . $machine_name . ' saved.');
   }
 }
 
