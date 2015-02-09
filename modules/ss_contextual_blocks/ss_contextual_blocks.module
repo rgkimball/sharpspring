@@ -321,3 +321,51 @@ function _ss_contextual_block_rule_name_exists($machine_name) {
 
   return !empty($exists);
 }
+
+/**
+ * Returns an associative array of blocks keyed by block ID.
+ *
+ * @return array
+ *   Associative array of drupal blocks.
+ */
+function _ss_contextual_block_get_all_blocks() {
+  $ret_blocks = array();
+
+  global $theme;
+  $def_theme = variable_get('theme_default', $theme);
+  $blocks = db_select('block', 'b')
+    ->fields('b', array('bid', 'delta', 'title', 'module'))
+    ->condition('theme', $def_theme)
+    ->execute()
+    ->fetchAll();
+
+  foreach ($blocks as $block) {
+    if (!empty($block->bid) && isset($block->module)) {
+      switch ($block->module) {
+        case 'ss_contextual_blocks':
+          // Do not add any of our own blocks.
+          break;
+
+        case 'webform':
+          // Get the node ID from delta.
+          $nid = drupal_substr($block->delta, strrpos($block->delta, '-') + 1);
+          $node = node_load($nid);
+          if (node_access('view', $node) && isset($node->title)) {
+            $ret_blocks[$block->bid] = $node->title;
+          }
+          break;
+
+        case 'views':
+          $view_name = explode('-', $block->delta);
+          $ret_blocks[$block->bid] = (!empty($view_name[0])) ? $view_name[0] : $block->delta;
+          break;
+
+        default:
+          $ret_blocks[$block->bid] = (!empty($block->title)) ? $block->title : ((!empty($block->delta)) ? $block->delta : '');
+          break;
+      }
+    }
+  }
+
+  return $ret_blocks;
+}

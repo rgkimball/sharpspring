@@ -99,12 +99,7 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
   );
 
   // Get a list of all active Drupal blocks.
-  global $theme;
-  $blocks = db_select('block', 'b')
-    ->fields('b', array('bid', 'delta'))
-    ->condition('theme', $theme)
-    ->execute()
-    ->fetchAllKeyed();
+  $blocks = _ss_contextual_block_get_all_blocks();
 
   $form['drupal_block'] = array(
     '#type' => 'select',
