@@ -87,7 +87,10 @@ function ss_contextual_blocks_schema() {
       ),
     ),
     'indexes' => array(
-      'ss_bid' => array('ss_bid'),
+      'data_id' => array('data_id'),
+    ),
+    'primary keys' => array(
+      'data_id' => array('data_id'),
     ),
   );
 

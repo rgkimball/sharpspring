@@ -145,10 +145,16 @@ function ss_contextual_blocks_callback($bid) {
  *   Returns array keyed by block id, values are block names.
  */
 function _ss_contextual_blocks_return_all_drupal_blocks() {
-  $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
-    ->fields('scb')
-    ->execute()
-    ->fetchAllKeyed();
+  if (db_table_exists('sharpspring_contextual_blocks')) {
+    $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
+      ->fields('scb')
+      ->execute()
+      ->fetchAllKeyed();
+  }
+  else {
+    $ss_blocks = array();
+  }
+
 
   return $ss_blocks;
 }
