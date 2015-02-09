@@ -13,7 +13,6 @@
  */
 function ssContextualBlock(resp) {
   (function ($, Drupal, window, document) {
-    if (Drupal.settings.sharpspring.segmentationField && resp[Drupal.settings.sharpspring.segmentationField]) {
       var segmentVal = resp;
 
       // Loop through each contextual block.
@@ -31,6 +30,5 @@ function ssContextualBlock(resp) {
           }
         });
       });
-    }
   })(jQuery, Drupal, this, this.document);
 }
