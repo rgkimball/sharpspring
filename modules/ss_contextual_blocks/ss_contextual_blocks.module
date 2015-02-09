@@ -125,8 +125,8 @@ function ss_contextual_blocks_callback($bid) {
         ->fetchAssoc();
 
       if (!empty($block_info['module']) && !empty($block_info['delta'])) {
-        $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
-        $ret_val = render($block);
+        $block = block_load('block', $block_info['delta']);
+        $ret_val = drupal_render(_block_get_renderable_array(_block_render_blocks(array($block))));
       }
     }
 
