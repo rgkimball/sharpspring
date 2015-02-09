@@ -53,9 +53,13 @@ function ss_contextual_blocks_block_view($delta = '') {
 function _ss_contextual_blocks_return_block_contents($bid) {
   // Add javascript to handle Sharpspring callback.
   $path = drupal_get_path('module', 'ss_contextual_blocks');
-  drupal_add_js($path . '/js/ss_contextual_blocks.js');
 
-  drupal_add_js(array('sharpspring' => array('calledFuncs' => array('ssContextualBlock'))), 'setting');
+  $has_added_block_js = &drupal_static('ss_c_block_has_added_js');
+  if (empty($has_added_block_js)) {
+    drupal_add_js($path . '/js/ss_contextual_blocks.js');
+    drupal_add_js(array('sharpspring' => array('calledFuncs' => array('ssContextualBlock'))), 'setting');
+    $has_added_block_js = TRUE;
+  }
 
   return '<div id="ss-contextual-block-' . $bid . '" class="ss-contextual-wrapper" ssbid="' . $bid . '"></div>';
 }
