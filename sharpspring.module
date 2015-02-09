@@ -56,8 +56,9 @@ function sharpspring_page_alter(&$page) {
   $domain = variable_get('sharpspring_domain');
 
   // 1. Check if the SS account number and domain have valid values.
+  // 1a. Do not add JS to admin pages.
   // 2. Create and insert js.
-  if (_sharpspring_validate_id($id) && _sharpspring_validate_domain($domain)) {
+  if (_sharpspring_validate_id($id) && _sharpspring_validate_domain($domain) && !path_is_admin(current_path())) {
 
     // Add the sharpspring custom segmentation field value.
     $segment_field = variable_get('sharpspring_segment_field');
