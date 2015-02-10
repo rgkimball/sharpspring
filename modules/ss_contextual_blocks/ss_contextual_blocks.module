@@ -90,6 +90,7 @@ function ss_contextual_blocks_callback($bid) {
   $rules = db_select('sharpspring_contextual_block_rules', 'sbd')
     ->fields('sbd')
     ->condition('ss_bid', $bid)
+    ->orderBy('weight')
     ->execute()
     ->fetchAll();
 
