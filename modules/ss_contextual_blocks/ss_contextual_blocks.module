@@ -35,7 +35,7 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/config/system/sharpspring/blocks/add'] = array(
+  $items['admin/config/system/sharpspring/blocks/add_rule'] = array(
     'title' => 'Add new SharpSpring contextual rule',
     'description' => 'Provides a form to add a new SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
@@ -45,7 +45,7 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/config/system/sharpspring/blocks/delete/%'] = array(
+  $items['admin/config/system/sharpspring/blocks/delete_rule/%'] = array(
     'title' => 'Delete SharpSpring contextual rule',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
@@ -55,11 +55,21 @@ function ss_contextual_blocks_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['admin/config/system/sharpspring/blocks/edit/%'] = array(
+  $items['admin/config/system/sharpspring/blocks/edit_rule/%'] = array(
     'title' => 'Edit SharpSpring contextual rule',
     'description' => 'Provides a form to edit a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ss_contextual_blocks_edit_rule_form', 6),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/config/system/sharpspring/blocks/add_block'] = array(
+    'title' => 'Add new SharpSpring contextual block',
+    'description' => 'Provides a form to add a new SharpSpring contextual block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_add_block_form'),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -70,6 +80,16 @@ function ss_contextual_blocks_menu() {
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ss_contextual_blocks_delete_block_form', 6),
+    'access arguments' => array('administer sharpspring'),
+    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/config/system/sharpspring/blocks/edit_block/%'] = array(
+    'title' => 'Edit SharpSpring contextual block',
+    'description' => 'Provides a form to edit a SharpSpring contextual block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ss_contextual_blocks_edit_block_form', 6),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,

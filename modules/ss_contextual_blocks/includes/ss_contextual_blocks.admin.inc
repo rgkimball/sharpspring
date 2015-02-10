@@ -25,30 +25,31 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#title' => 'SharpSpring Contextual Blocks',
   );
 
-  $form['block_table']['add_block'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Add new SharpSpring Block'),
+  $form['block_table']['actions'] = array(
+    '#type' => 'actions',
   );
-  $form['block_table']['add_block']['new_block_name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Block Name'),
-    '#maxlength' => 128,
-  );
-  $form['block_table']['add_block']['block_submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Add Block',
+  $form['block_table']['actions']['new_block'] = array(
+    '#markup' => l(t('Add Block'), 'admin/config/system/sharpspring/blocks/add_block'),
   );
 
   $rows = array();
 
   // Format block table rows.
-  foreach ($ss_blocks as $bid => $block) {
+  foreach ($ss_blocks as $bid => $rule) {
     // Build the table rows.
     $rows[$bid] = array(
       'data' => array(
         // Block name column.
-        check_plain($block),
+        check_plain($rule),
         // Operations.
+        array(
+          'data' => array(
+            '#theme' => 'link',
+            '#text' => t('edit'),
+            '#path' => 'admin/config/system/sharpspring/blocks/edit_block/' . $bid,
+            '#options' => array('attributes' => array(), 'html' => FALSE),
+          ),
+        ),
         array(
           'data' => array(
             '#theme' => 'link',
@@ -68,7 +69,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#header' => array(
       // We need two empty columns for the weigth field and the cross.
       t('Sharpspring Block'),
-      t('Operations'),
+      array('data' => t('Operations'), 'colspan' => 2),
     ),
     '#rows' => $rows,
     '#empty' => t('There are no blocks available.'),
@@ -84,7 +85,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#type' => 'actions',
   );
   $form['rules_table']['actions']['new_rule'] = array(
-    '#markup' => l(t('Add Rule'), 'admin/config/system/sharpspring/blocks/add'),
+    '#markup' => l(t('Add Rule'), 'admin/config/system/sharpspring/blocks/add_rule'),
   );
 
   // Load the custom rules.
@@ -94,13 +95,13 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
   $row_elements = array();
 
   // Format custom rule table rows.
-  foreach ($contents as $block) {
-    $name = (!empty($block['block_name'])) ? $block['block_name'] : '';
-    $machine_name = (!empty($block['machine_name'])) ? $block['machine_name'] : '';
-    $weight = (!empty($block['weight'])) ? $block['weight'] : 0;
+  foreach ($contents as $rule) {
+    $name = (!empty($rule['block_name'])) ? $rule['block_name'] : '';
+    $machine_name = (!empty($rule['machine_name'])) ? $rule['machine_name'] : '';
+    $weight = (!empty($rule['weight'])) ? $rule['weight'] : 0;
 
-    if (!empty($block['data_id'])) {
-      $id = $block['data_id'];
+    if (!empty($rule['data_id'])) {
+      $id = $rule['data_id'];
       // Build the table rows.
       $rows[$id] = array(
         'data' => array(
@@ -127,7 +128,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
             'data' => array(
               '#theme' => 'link',
               '#text' => t('edit'),
-              '#path' => 'admin/config/system/sharpspring/blocks/edit/' . $block['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/edit_rule/' . $rule['data_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
@@ -135,7 +136,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
             'data' => array(
               '#theme' => 'link',
               '#text' => t('delete'),
-              '#path' => 'admin/config/system/sharpspring/blocks/delete/' . $block['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/delete_rule/' . $rule['data_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
