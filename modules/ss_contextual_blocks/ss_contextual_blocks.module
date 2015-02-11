@@ -101,21 +101,22 @@ function ss_contextual_blocks_menu() {
 /**
  * Returns a drupal block depending on sharpspring block and segment.
  *
- * @param int $bid
+ * @param int $ss_bid
  *   An integer indicating the internal sharpspring block id.
  */
-function ss_contextual_blocks_callback($bid) {
+function ss_contextual_blocks_callback($ss_bid) {
   $ret_val = '';
 
   $rules = db_select('sharpspring_contextual_block_rules', 'sbd')
     ->fields('sbd')
-    ->condition('ss_bid', $bid)
     ->orderBy('weight')
     ->execute()
     ->fetchAll();
 
+  // Load all of our rules and check which one passes.
+  // This is the rule_id we will use.
   if (!empty($rules)) {
-    $block_id = 0;
+    $rule_id = 0;
 
     foreach ($rules as $segment_rule) {
       if (!empty($segment_rule->segment_rule)) {
@@ -132,35 +133,65 @@ function ss_contextual_blocks_callback($bid) {
         }
 
         if ($passed_rule) {
-          $block_id = (!empty($segment_rule->block_id)) ? $segment_rule->block_id : 0;
+          $rule_id = (!empty($segment_rule->rule_id)) ? $segment_rule->rule_id : 0;
         }
 
       }
     }
 
-    if (!empty($block_id)) {
-      $block_info = db_select('block', 'b')
-        ->fields('b', array('module', 'delta', 'title'))
-        ->condition('bid', $block_id)
+    if (!empty($rule_id)) {
+      $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+        ->fields('sbr')
+        ->condition('rule_id', $rule_id)
+        ->condition('ss_bid', $ss_bid)
         ->execute()
         ->fetchAssoc();
 
-      if (!empty($block_info['module']) && !empty($block_info['delta'])) {
-        switch ($block_info['module']) {
-          case 'block':
-            $block = block_load('block', $block_info['delta']);
-            $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
-            $ret_val = drupal_render($render_array);
-            break;
-
-          default:
-            $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
-            if (!empty($block['content'])) {
-              $ret_val = render($block['content']);
-            }
-            break;
-        }
+      if (isset($drupal_block['bid']) && $drupal_block['bid'] == -1) {
+        // The user has selected 'none' as the content here.
       }
+      else {
+        if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
+          // The user has selected 'default' as the content.
+          // Load the default rule for this SS block.
+
+          $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+            ->fields('sbr')
+            ->condition('rule_id', 0)
+            ->condition('ss_bid', $ss_bid)
+            ->execute()
+            ->fetchAssoc();
+
+        }
+
+        if (!empty($drupal_block['bid']) && $drupal_block['bid'] != -1) {
+          // One last check for empty content.
+          $block_info = db_select('block', 'b')
+            ->fields('b', array('module', 'delta', 'title'))
+            ->condition('bid', $drupal_block['bid'])
+            ->execute()
+            ->fetchAssoc();
+
+          if (!empty($block_info['module']) && !empty($block_info['delta'])) {
+            switch ($block_info['module']) {
+              case 'block':
+                $block = block_load('block', $block_info['delta']);
+                $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
+                $ret_val = drupal_render($render_array);
+                break;
+
+              default:
+                $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
+                if (!empty($block['content'])) {
+                  $ret_val = render($block['content']);
+                }
+                break;
+            }
+          }
+        }
+
+      }
+
     }
 
   }
@@ -392,7 +423,7 @@ function _ss_contextual_blocks_return_block_from_block_id($ss_bid) {
  *
  * @param int $ss_bid
  *   SharpSpring block id.
- * 
+ *
  * @return array
  *   Associative array of reactions for the passed block.
  */
