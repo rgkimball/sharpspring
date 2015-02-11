@@ -13,9 +13,9 @@ function ss_contextual_blocks_block_info() {
   $blocks = array();
   $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
 
-  foreach ($ss_blocks as $bid => $name) {
+  foreach ($ss_blocks as $bid => $block) {
     $blocks['ss_contextual_block_' . $bid] = array(
-      'info' => $name,
+      'info' => (!empty($block->name)) ? 'SharpSpring: ' . $block->name : 'SharpSpring block ' . $bid,
       'cache' => DRUPAL_CACHE_PER_ROLE,
     );
   }

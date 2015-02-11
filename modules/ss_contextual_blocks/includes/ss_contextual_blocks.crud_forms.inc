@@ -105,6 +105,8 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
  *   An array of form elements.
  */
 function _ss_contextual_set_block_form(&$form) {
+  $form['#tree'] = TRUE;
+
   $form['block_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Block Name'),
@@ -118,6 +120,48 @@ function _ss_contextual_set_block_form(&$form) {
     '#description' => t('A brief description of the function of this block.'),
     '#rows' => 3,
     '#required' => TRUE,
+  );
+
+  $form['reactions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Reactions'),
+  );
+
+  $form['reactions']['table_begin'] = array(
+    '#markup' => '<table><tr><th>SharpSpring Rule</th><th>Block Shown</th></tr>',
+  );
+
+  $blocks = _ss_contextual_block_get_all_blocks();
+  $blocks[-1] = '- None -';
+  ksort($blocks);
+
+  $form['reactions'][0]['react_rule'] = array(
+    '#type' => 'select',
+    '#options' => $blocks,
+    '#prefix' => '<tr class="even"><td>Default</td><td>',
+    '#suffix' => '</td></tr>',
+  );
+
+  $current_rules = _ss_contextual_blocks_return_all_ss_rules();
+  $blocks[0] = '- Default -';
+  ksort($blocks);
+
+  $count = 1;
+  foreach ($current_rules as $rule) {
+    $class = ($count % 2 == 0) ? 'even' : 'odd';
+    if (!empty($rule['rule_id']) && isset($rule['name'])) {
+      $form['reactions'][$rule['rule_id']]['react_rule'] = array(
+        '#type' => 'select',
+        '#options' => $blocks,
+        '#prefix' => '<tr class="' . $class . '"><td>' . $rule['name'] . '</td><td>',
+        '#suffix' => '</td></tr>',
+      );
+      $count++;
+    }
+  }
+
+  $form['reactions']['table_end'] = array(
+    '#markup' => '</table>',
   );
 
   $form['submit'] = array(
@@ -487,20 +531,41 @@ function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
   $name = (!empty($new_vals['block_name'])) ? $new_vals['block_name'] : '';
   $description = (!empty($new_vals['block_description'])) ? $new_vals['block_description'] : '';
+  $reactions = (!empty($new_vals['reactions'])) ? $new_vals['reactions'] : array();
 
   if (!empty($name) && !empty($description)) {
-    _ss_contextual_blocks_insert_block($name, $description);
+    _ss_contextual_blocks_insert_block($name, $description, $reactions);
     drupal_set_message('SharpSpring block ' . $name . ' saved.');
   }
 }
 
+/**
+ * Returns the edit SharpSpring block form.
+ *
+ * @param array $form
+ *   An array of form elements.
+ * @param array $form_state
+ *   An array representing the current form state.
+ * @param int $ss_bid
+ *   SharpSpring block id.
+ *
+ * @return array
+ *   The current form.
+ */
 function ss_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
   _ss_contextual_set_block_form($form);
 
   $this_block = _ss_contextual_blocks_return_block_from_block_id($ss_bid);
+  $reactions = _ss_contextual_blocks_return_reactions_from_block_id($ss_bid);
 
   $form['block_name']['#default_value'] = (!empty($this_block['name'])) ? $this_block['name'] : '';
   $form['block_description']['#default_value'] = (!empty($this_block['description'])) ? $this_block['description'] : '';
+
+  foreach ($reactions as $react_id => $saved_reaction) {
+    if (isset($form['reactions'][$react_id]) && isset($saved_reaction->bid)) {
+      $form['reactions'][$react_id]['react_rule']['#default_value'] = $saved_reaction->bid;
+    }
+  }
 
   $form['ss_bid'] = array(
     '#type' => 'hidden',
@@ -510,14 +575,23 @@ function ss_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
   return $form;
 }
 
+/**
+ * Handles saving of and edited SharpSpring block.
+ *
+ * @param array $form
+ *   An array of form elements.
+ * @param array $form_state
+ *   An array representing the current form state.
+ */
 function ss_contextual_blocks_edit_block_form_submit($form, &$form_state) {
   $values = (!empty($form_state['input'])) ? $form_state['input'] : array();
   $ss_bid = (!empty($values['ss_bid'])) ? $values['ss_bid'] : 0;
   $name = (!empty($values['block_name'])) ? $values['block_name'] : '';
   $description = (!empty($values['block_description'])) ? $values['block_description'] : '';
+  $reactions = (!empty($values['reactions'])) ? $values['reactions'] : array();
 
   if (!empty($ss_bid) && !empty($name) && !empty($description)) {
-    _ss_contextual_blocks_update_block($ss_bid, $name, $description);
+    _ss_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);
     drupal_set_message('SharpSpring block ' . $name . ' updated.');
   }
 }

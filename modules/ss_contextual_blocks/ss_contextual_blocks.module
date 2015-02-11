@@ -252,10 +252,12 @@ function _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description
  *   Integer value of SharpSpring block ID.
  * @param string $name
  *   Name of the SharpSpring block.
- * @param $description
+ * @param string $description
  *   Description of the SharpSpring block.
+ * @param array $reactions
+ *   Array of block reactions.
  */
-function _ss_contextual_blocks_update_block($ss_bid, $name, $description) {
+function _ss_contextual_blocks_update_block($ss_bid, $name, $description, $reactions) {
   if (is_numeric($ss_bid)) {
     db_update('sharpspring_contextual_blocks')
       ->fields(array(
@@ -264,6 +266,24 @@ function _ss_contextual_blocks_update_block($ss_bid, $name, $description) {
       ))
       ->condition('ss_bid', $ss_bid)
       ->execute();
+
+    // Clear all existing block reactions.
+    db_delete('sharpspring_contextual_block_reactions')
+      ->condition('ss_bid', $ss_bid)
+      ->execute();
+
+    foreach ($reactions as $rule_id => $reaction) {
+      if (isset($reaction['react_rule']) && is_numeric($reaction['react_rule'])) {
+        db_insert('sharpspring_contextual_block_reactions')
+          ->fields(array(
+            'rule_id' => $rule_id,
+            'ss_bid' => $ss_bid,
+            'bid' => $reaction['react_rule'],
+          ))
+          ->execute();
+      }
+    }
+
   }
 
 }
@@ -295,14 +315,30 @@ function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
  *   Name of the new SharpSpring block.
  * @param string $description
  *   Description of the SharpSpring block.
+ * @param array $reactions
+ *   Associative array of block reactions.
  */
-function _ss_contextual_blocks_insert_block($name, $description) {
-  db_insert('sharpspring_contextual_blocks')
+function _ss_contextual_blocks_insert_block($name, $description, $reactions) {
+  $new_bid = db_insert('sharpspring_contextual_blocks')
     ->fields(array(
       'name' => $name,
       'description' => $description,
     ))
     ->execute();
+
+  if (!empty($new_bid)) {
+    foreach ($reactions as $rule_id => $reaction) {
+      if (isset($reaction['react_rule']) && is_numeric($reaction['react_rule'])) {
+        db_insert('sharpspring_contextual_block_reactions')
+          ->fields(array(
+            'rule_id' => $rule_id,
+            'ss_bid' => $new_bid,
+            'bid' => $reaction['react_rule'],
+          ))
+          ->execute();
+      }
+    }
+  }
 }
 
 /**
@@ -333,6 +369,7 @@ function _ss_contextual_blocks_return_rule_from_data_id($rule_id) {
  *
  * @param int $ss_bid
  *   SharpSpring block ID.
+ *
  * @return array
  *   Associative array of field values for the passed block.
  */
@@ -345,6 +382,29 @@ function _ss_contextual_blocks_return_block_from_block_id($ss_bid) {
       ->condition('ss_bid', $ss_bid)
       ->execute()
       ->fetchAssoc();
+  }
+
+  return $ret_val;
+}
+
+/**
+ * Returns reactions for a passed block id.
+ *
+ * @param int $ss_bid
+ *   SharpSpring block id.
+ * 
+ * @return array
+ *   Associative array of reactions for the passed block.
+ */
+function _ss_contextual_blocks_return_reactions_from_block_id($ss_bid) {
+  $ret_val = array();
+
+  if (is_numeric($ss_bid)) {
+    $ret_val = db_select('sharpspring_contextual_block_reactions', 'sreac')
+      ->fields('sreac')
+      ->condition('ss_bid', $ss_bid)
+      ->execute()
+      ->fetchAllAssoc('rule_id');
   }
 
   return $ret_val;
