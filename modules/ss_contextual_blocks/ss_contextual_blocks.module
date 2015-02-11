@@ -175,14 +175,14 @@ function ss_contextual_blocks_callback($bid) {
  * standard Drupal block system. The contents are defined elsewhere.
  *
  * @return array
- *   Returns array keyed by block id, values are block names.
+ *   Returns array keyed by block id, values is an object of field values.
  */
 function _ss_contextual_blocks_return_all_drupal_blocks() {
   if (db_table_exists('sharpspring_contextual_blocks')) {
     $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
       ->fields('scb')
       ->execute()
-      ->fetchAllKeyed();
+      ->fetchAllAssoc('ss_bid');
   }
   else {
     $ss_blocks = array();
@@ -195,39 +195,24 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
  * Helper function to return SharpSpring contextual rules.
  *
  * @return array
- *   Returns array of block contexts keyed by ss block id.
+ *   Returns array of rules.
  */
 function _ss_contextual_blocks_return_all_ss_rules() {
   $ret_val = array();
 
-  $ss_blocks = db_select('sharpspring_contextual_block_rules', 'sbr');
-  $ss_blocks->join('sharpspring_contextual_blocks', 'scb', 'sbr.ss_bid = scb.ss_bid');
-  $ss_blocks
-    ->fields('sbr',
-      array(
-        'ss_bid',
-        'segment_rule',
-        'block_id',
-        'data_id',
-        'weight',
-        'machine_name',
-      )
-    )
-    ->fields('scb', array('name'))
-    ->orderBy('sbr.weight');
+  $rules = db_select('sharpspring_contextual_block_rules', 'sbr')
+    ->fields('sbr')
+    ->execute()
+    ->fetchAll();
 
-  $result = $ss_blocks->execute()->fetchAll();
-
-  foreach ($result as $block_info) {
-    if (!empty($block_info->ss_bid) && !empty($block_info->segment_rule) && !empty($block_info->block_id) && !empty($block_info->name) && !empty($block_info->data_id) && isset($block_info->weight) && !empty($block_info->machine_name)) {
+  foreach ($rules as $rule) {
+    if (!empty($rule->rule_id) && !empty($rule->segment_rule) && isset($rule->description) && isset($rule->name) && isset($rule->weight)) {
       $ret_val[] = array(
-        'ss_bid' => $block_info->ss_bid,
-        'block_id' => $block_info->block_id,
-        'block_name' => $block_info->name,
-        'machine_name' => $block_info->machine_name,
-        'data_id' => $block_info->data_id,
-        'weight' => $block_info->weight,
-        'rules' => json_decode($block_info->segment_rule, TRUE),
+        'rule_id' => $rule->rule_id,
+        'name' => $rule->name,
+        'description' => $rule->description,
+        'weight' => $rule->weight,
+        'rules' => json_decode($rule->segment_rule, TRUE),
       );
     }
   }
@@ -238,67 +223,126 @@ function _ss_contextual_blocks_return_all_ss_rules() {
 /**
  * Updates a SS contextual block rule.
  *
- * @param int $ss_bid
- *   Integer value of SharpSpring block.
+ * @param int $rule_id
+ *   Unique integer ID of the rule.
  * @param string $rules
  *   JSON encoded SharpSpring rules.
- * @param int $block_id
- *   Integer value of drupal block.
- * @param int $data_id
- *   Unique integer ID of the rule
- *
- * @throws \Exception
+ * @param string $name
+ *   Name of the rule.
+ * @param string $description
+ *   Description of the rule.
  */
-function _ss_contextual_blocks_update_rule($ss_bid, $rules, $block_id, $data_id) {
-  db_update('sharpspring_contextual_block_rules')
-    ->fields(array(
-      'block_id' => $block_id,
-      'segment_rule' => $rules,
-      'ss_bid' => $ss_bid,
-    ))
-    ->condition('data_id', $data_id)
-    ->execute();
+function _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description) {
+  if (is_numeric($rule_id)) {
+    db_update('sharpspring_contextual_block_rules')
+      ->fields(array(
+        'segment_rule' => $rules,
+        'name' => $name,
+        'description' => $description,
+      ))
+      ->condition('rule_id', $rule_id)
+      ->execute();
+  }
+}
+
+/**
+ * Updates a SharpSpring contextual block.
+ *
+ * @param int $ss_bid
+ *   Integer value of SharpSpring block ID.
+ * @param string $name
+ *   Name of the SharpSpring block.
+ * @param $description
+ *   Description of the SharpSpring block.
+ */
+function _ss_contextual_blocks_update_block($ss_bid, $name, $description) {
+  if (is_numeric($ss_bid)) {
+    db_update('sharpspring_contextual_blocks')
+      ->fields(array(
+        'name' => $name,
+        'description' => $description,
+      ))
+      ->condition('ss_bid', $ss_bid)
+      ->execute();
+  }
+
 }
 
 /**
  * Inserts a new SharpSpring contextual rule.
  *
- * @param int $ss_bid
- *   Integer ID of SharpSpring block.
  * @param string $rules
  *   JSON encoded SharpSpring rules.
- * @param int $block_id
- *   Drupal block ID.
- * @param string $machine_name
- *   Unique machine name of the rule.
+ * @param string $name
+ *   Name of the rule.
+ * @param string $description
+ *   Description of the rule's function.
  */
-function _ss_contextual_blocks_insert_rule($ss_bid, $rules, $block_id, $machine_name) {
+function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
   db_insert('sharpspring_contextual_block_rules')
     ->fields(array(
-      'ss_bid' => $ss_bid,
       'segment_rule' => $rules,
-      'block_id' => $block_id,
-      'machine_name' => $machine_name,
+      'name' => $name,
+      'description' => $description,
     ))
     ->execute();
 }
 
 /**
- * Returns rule fields for a passed unique data_id.
+ * Inserts a new SharpSpring block.
  *
- * @param int $data_id
+ * @param string $name
+ *   Name of the new SharpSpring block.
+ * @param string $description
+ *   Description of the SharpSpring block.
+ */
+function _ss_contextual_blocks_insert_block($name, $description) {
+  db_insert('sharpspring_contextual_blocks')
+    ->fields(array(
+      'name' => $name,
+      'description' => $description,
+    ))
+    ->execute();
+}
+
+/**
+ * Returns rule fields for a passed unique rule_id.
+ *
+ * @param int $rule_id
  *   Unique ID of the rule.
  *
  * @return array
  *   Associative array of field values for the passed rule.
  */
-function _ss_contextual_blocks_return_rule_from_data_id($data_id) {
+function _ss_contextual_blocks_return_rule_from_data_id($rule_id) {
   $ret_val = array();
 
-  if (is_numeric($data_id)) {
+  if (is_numeric($rule_id)) {
     $ret_val = db_select('sharpspring_contextual_block_rules', 'sbr')
       ->fields('sbr')
-      ->condition('data_id', $data_id)
+      ->condition('rule_id', $rule_id)
+      ->execute()
+      ->fetchAssoc();
+  }
+
+  return $ret_val;
+}
+
+/**
+ * Returns block fields for a passed unique ss_bid.
+ *
+ * @param int $ss_bid
+ *   SharpSpring block ID.
+ * @return array
+ *   Associative array of field values for the passed block.
+ */
+function _ss_contextual_blocks_return_block_from_block_id($ss_bid) {
+  $ret_val = array();
+
+  if (is_numeric($ss_bid)) {
+    $ret_val = db_select('sharpspring_contextual_blocks', 'scb')
+      ->fields('scb')
+      ->condition('ss_bid', $ss_bid)
       ->execute()
       ->fetchAssoc();
   }

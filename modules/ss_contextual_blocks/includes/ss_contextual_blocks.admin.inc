@@ -35,12 +35,16 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
   $rows = array();
 
   // Format block table rows.
-  foreach ($ss_blocks as $bid => $rule) {
+  foreach ($ss_blocks as $bid => $block) {
+    $name = (!empty($block->name)) ? $block->name : '';
+    $description = (!empty($block->description)) ? $block->description : '';
+
     // Build the table rows.
     $rows[$bid] = array(
       'data' => array(
         // Block name column.
-        check_plain($rule),
+        check_plain($name),
+        check_plain($description),
         // Operations.
         array(
           'data' => array(
@@ -68,7 +72,8 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#theme' => 'table',
     '#header' => array(
       // We need two empty columns for the weigth field and the cross.
-      t('Sharpspring Block'),
+      t('Sharpspring Block Name'),
+      t('Description'),
       array('data' => t('Operations'), 'colspan' => 2),
     ),
     '#rows' => $rows,
@@ -96,12 +101,12 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
 
   // Format custom rule table rows.
   foreach ($contents as $rule) {
-    $name = (!empty($rule['block_name'])) ? $rule['block_name'] : '';
-    $machine_name = (!empty($rule['machine_name'])) ? $rule['machine_name'] : '';
+    $name = (!empty($rule['name'])) ? $rule['name'] : '';
+    $description = (!empty($rule['description'])) ? $rule['description'] : '';
     $weight = (!empty($rule['weight'])) ? $rule['weight'] : 0;
 
-    if (!empty($rule['data_id'])) {
-      $id = $rule['data_id'];
+    if (!empty($rule['rule_id'])) {
+      $id = $rule['rule_id'];
       // Build the table rows.
       $rows[$id] = array(
         'data' => array(
@@ -122,13 +127,13 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
           ),
           // Name and machine name columns.
           check_plain($name),
-          check_plain($machine_name),
+          check_plain($description),
           // Operations.
           array(
             'data' => array(
               '#theme' => 'link',
               '#text' => t('edit'),
-              '#path' => 'admin/config/system/sharpspring/blocks/edit_rule/' . $rule['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/edit_rule/' . $rule['rule_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
@@ -136,7 +141,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
             'data' => array(
               '#theme' => 'link',
               '#text' => t('delete'),
-              '#path' => 'admin/config/system/sharpspring/blocks/delete_rule/' . $rule['data_id'],
+              '#path' => 'admin/config/system/sharpspring/blocks/delete_rule/' . $rule['rule_id'],
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
@@ -160,8 +165,8 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
     '#header' => array(
       // We need two empty columns for the weigth field and the cross.
       array('data' => NULL, 'colspan' => 2),
-      t('Sharpspring Block'),
       t('Rule Name'),
+      t('Description'),
       array('data' => t('Operations'), 'colspan' => 2),
     ),
     '#rows' => $rows,

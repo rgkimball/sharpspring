@@ -16,6 +16,9 @@ function ss_contextual_blocks_uninstall() {
   if (db_table_exists('sharpspring_contextual_block_rules')) {
     db_query('DROP TABLE {sharpspring_contextual_block_rules}');
   }
+  if (db_table_exists('sharpspring_contextual_block_reactions')) {
+    db_query('DROP TABLE {sharpspring_contextual_block_reactions}');
+  }
 }
 
 /**
@@ -36,6 +39,11 @@ function ss_contextual_blocks_schema() {
         'length' => 255,
         'description' => 'Contextual Block name',
       ),
+      'description' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'description' => 'Description of contextual block',
+      ),
     ),
     'indexes' => array(
       'ss_bid' => array('ss_bid'),
@@ -48,28 +56,16 @@ function ss_contextual_blocks_schema() {
   $schema['sharpspring_contextual_block_rules'] = array(
     'description' => 'Stores SharpSpring contextual block rules',
     'fields' => array(
-      'data_id' => array(
+      'rule_id' => array(
         'type' => 'serial',
         'size' => 'normal',
         'not null' => TRUE,
         'description' => 'Contextual Rule ID',
       ),
-      'ss_bid' => array(
-        'type' => 'int',
-        'size' => 'normal',
-        'not null' => TRUE,
-        'description' => 'SharpSpring Contextual Block internal ID',
-      ),
       'segment_rule' => array(
         'type' => 'text',
         'size' => 'normal',
-        'description' => 'SharpSpring segment rule',
-      ),
-      'block_id' => array(
-        'type' => 'int',
-        'size' => 'normal',
-        'not null' => TRUE,
-        'description' => 'Block id',
+        'description' => 'SharpSpring JSON encoded segment rule definitions',
       ),
       'weight' => array(
         'type' => 'int',
@@ -78,19 +74,45 @@ function ss_contextual_blocks_schema() {
         'default' => 0,
         'description' => 'Rule weight',
       ),
-      'machine_name' => array(
+      'name' => array(
         'type' => 'varchar',
-        'length' => 128,
+        'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Rule machine name',
+        'description' => 'Rule name',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'description' => 'Description of contextual rule',
       ),
     ),
     'indexes' => array(
-      'data_id' => array('data_id'),
+      'rule_id' => array('rule_id'),
     ),
     'primary keys' => array(
-      'data_id' => array('data_id'),
+      'rule_id' => array('rule_id'),
+    ),
+  );
+
+  $schema['sharpspring_contextual_block_reactions'] = array(
+    'description' => 'Defines reactions to sharpspring rules for contextual blocks',
+    'fields' => array(
+      'rule_id' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'description' => 'SharpSpring rule ID from sharpspring_contextual_block_rules table',
+      ),
+      'ss_bid' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'description' => 'SharpSpring block ID from sharpspring_contextual_blocks table',
+      ),
+      'bid' => array(
+        'type' => 'int',
+        'size' => 'normal',
+        'description' => 'Block ID from the block table',
+      ),
     ),
   );
 
