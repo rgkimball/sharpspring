@@ -125,7 +125,7 @@ function ss_contextual_blocks_callback($ss_bid) {
         $processed_rules = (!empty($this_rule->rules)) ? $this_rule->rules : array();
 
         // OR starts with the test as false.
-        // And then passes that one rule has passed.
+        // Then passes when one rule has passed.
         // AND starts as true and fails when one fails.
         $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
         foreach ($processed_rules as $rule_part) {
