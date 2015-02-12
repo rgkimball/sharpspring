@@ -328,15 +328,20 @@ function _ss_contextual_blocks_update_block($ss_bid, $name, $description, $react
  *   Name of the rule.
  * @param string $description
  *   Description of the rule's function.
+ *
+ * @return int
+ *   Returns id of new rule.
  */
 function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
-  db_insert('sharpspring_contextual_block_rules')
+  $new_id = db_insert('sharpspring_contextual_block_rules')
     ->fields(array(
       'segment_rule' => $rules,
       'name' => $name,
       'description' => $description,
     ))
     ->execute();
+
+  return $new_id;
 }
 
 /**
@@ -348,6 +353,9 @@ function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
  *   Description of the SharpSpring block.
  * @param array $reactions
  *   Associative array of block reactions.
+ *
+ * @return int
+ *   Returns the inserted block id.
  */
 function _ss_contextual_blocks_insert_block($name, $description, $reactions) {
   $new_bid = db_insert('sharpspring_contextual_blocks')
@@ -370,6 +378,8 @@ function _ss_contextual_blocks_insert_block($name, $description, $reactions) {
       }
     }
   }
+
+  return $new_bid;
 }
 
 /**

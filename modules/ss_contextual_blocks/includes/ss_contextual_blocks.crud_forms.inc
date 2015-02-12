@@ -201,8 +201,10 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : 0;
   $rules = (!empty($new_vals['rules_fieldset'])) ? json_encode($new_vals['rules_fieldset']) : '{}';
 
-  _ss_contextual_blocks_insert_rule($rules, $name, $description);
+  $new_rule = _ss_contextual_blocks_insert_rule($rules, $name, $description);
   drupal_set_message('SharpSpring rule ' . $name . ' saved.');
+
+  $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_rule/' . $new_rule;
 }
 
 /**
@@ -534,8 +536,9 @@ function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
   $reactions = (!empty($new_vals['reactions'])) ? $new_vals['reactions'] : array();
 
   if (!empty($name) && !empty($description)) {
-    _ss_contextual_blocks_insert_block($name, $description, $reactions);
+    $new_bid = _ss_contextual_blocks_insert_block($name, $description, $reactions);
     drupal_set_message('SharpSpring block ' . $name . ' saved.');
+    $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_block/' . $new_bid;
   }
 }
 
