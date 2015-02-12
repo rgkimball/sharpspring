@@ -38,6 +38,15 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
     '#suffix' => '</div>',
   );
 
+  $form['rules_fieldset']['and_or'] = array(
+    '#type' => 'select',
+    '#title' => 'Rule passes if the lead has',
+    '#options' => array(
+      'and' => 'All of these field values',
+      'or' => 'Any of these field values'
+    ),
+  );
+
   $form['rules_fieldset']['table_begin'] = array(
     '#markup' => '<table>',
   );
@@ -199,7 +208,14 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : 0;
-  $rules = (!empty($new_vals['rules_fieldset'])) ? json_encode($new_vals['rules_fieldset']) : '{}';
+  $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
+  $and_or =  (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
+  unset($rules['and_or']);
+  $rules = array(
+    'and_or' => $and_or,
+    'rules' => $rules,
+  );
+  $rules = json_encode($rules);
 
   $new_rule = _ss_contextual_blocks_insert_rule($rules, $name, $description);
   drupal_set_message('SharpSpring rule ' . $name . ' saved.');
@@ -449,12 +465,15 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
   $this_rule = _ss_contextual_blocks_return_rule_from_data_id($rule_id);
 
   if (!empty($this_rule)) {
-    $rules = (!empty($this_rule['segment_rule'])) ? json_decode($this_rule['segment_rule'], TRUE) : array();
+    $raw_rules = (!empty($this_rule['segment_rule'])) ? json_decode($this_rule['segment_rule'], TRUE) : array();
+    $and_or = (!empty($raw_rules['and_or'])) ? $raw_rules['and_or'] : 'and';
+    $rules = (!empty($raw_rules['rules'])) ? $raw_rules['rules'] : array();
+
     if (empty($form_state['num_rules'])) {
       // If this is the first load of the form, set up the default rules.
 
       if (count($rules) > 0) {
-        $form_state['num_rules'] = count($rules);
+        $form_state['num_rules'] = (!empty($rules)) ? count($rules) : 0;
       }
     }
 
@@ -462,6 +481,7 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
 
     $form['name']['#default_value'] = (!empty($this_rule['name'])) ? $this_rule['name'] : '';
     $form['description']['#default_value'] = (!empty($this_rule['description'])) ? $this_rule['description'] : '';
+    $form['rules_fieldset']['and_or']['#default_value'] = $and_or;
 
     foreach ($rules as $rule_num => $rule_content) {
       $form['rules_fieldset'][$rule_num]['fieldname']['#default_value'] = (!empty($rule_content['fieldname'])) ? $rule_content['fieldname'] : '';
@@ -495,7 +515,14 @@ function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : '';
-  $rules = (!empty($new_vals['rules_fieldset'])) ? json_encode($new_vals['rules_fieldset']) : '{}';
+  $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
+  $and_or =  (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
+  unset($rules['and_or']);
+  $rules = array(
+    'and_or' => $and_or,
+    'rules' => $rules,
+  );
+  $rules = json_encode($rules);
   $rule_id = (!empty($new_vals['rule_id'])) ? $new_vals['rule_id'] : 0;
 
   if (!empty($rule_id) && is_numeric($rule_id)) {

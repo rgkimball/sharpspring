@@ -121,13 +121,26 @@ function ss_contextual_blocks_callback($ss_bid) {
     foreach ($rules as $segment_rule) {
       if (!empty($segment_rule->segment_rule)) {
         $this_rule = json_decode($segment_rule->segment_rule);
+        $and_or = (!empty($this_rule->and_or)) ? $this_rule->and_or : 'and';
+        $processed_rules = (!empty($this_rule->rules)) ? $this_rule->rules : array();
 
-        $passed_rule = TRUE;
-        foreach ($this_rule as $rule_part) {
+        // OR starts with the test as false.
+        // And then passes that one rule has passed.
+        // AND starts as true and fails when one fails.
+        $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
+        foreach ($processed_rules as $rule_part) {
           if (isset($rule_part->fieldname) && isset($rule_part->value)) {
-            if (!isset($_POST[$rule_part->fieldname]) || $_POST[$rule_part->fieldname] != $rule_part->value) {
-              // This rule failed, so we set $passed_rule to FALSE;
-              $passed_rule = FALSE;
+            if ($and_or == 'or') {
+              // Any passed rule will make this true.
+              if (isset($_POST[$rule_part->fieldname]) && $_POST[$rule_part->fieldname] == $rule_part->value) {
+                $passed_rule = TRUE;
+              }
+            }
+            else {
+              if (!isset($_POST[$rule_part->fieldname]) || $_POST[$rule_part->fieldname] != $rule_part->value) {
+                // This rule failed, so we set $passed_rule to FALSE;
+                $passed_rule = FALSE;
+              }
             }
           }
         }
@@ -139,57 +152,55 @@ function ss_contextual_blocks_callback($ss_bid) {
       }
     }
 
-    if (!empty($rule_id)) {
-      $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
-        ->fields('sbr')
-        ->condition('rule_id', $rule_id)
-        ->condition('ss_bid', $ss_bid)
-        ->execute()
-        ->fetchAssoc();
 
-      if (isset($drupal_block['bid']) && $drupal_block['bid'] == -1) {
-        // The user has selected 'none' as the content here.
+    $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+      ->fields('sbr')
+      ->condition('rule_id', $rule_id)
+      ->condition('ss_bid', $ss_bid)
+      ->execute()
+      ->fetchAssoc();
+
+    if (isset($drupal_block['bid']) && $drupal_block['bid'] == -1) {
+      // The user has selected 'none' as the content here.
+    }
+    else {
+      if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
+        // The user has selected 'default' as the content.
+        // Load the default rule for this SS block.
+
+        $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+          ->fields('sbr')
+          ->condition('rule_id', 0)
+          ->condition('ss_bid', $ss_bid)
+          ->execute()
+          ->fetchAssoc();
+
       }
-      else {
-        if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
-          // The user has selected 'default' as the content.
-          // Load the default rule for this SS block.
 
-          $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
-            ->fields('sbr')
-            ->condition('rule_id', 0)
-            ->condition('ss_bid', $ss_bid)
-            ->execute()
-            ->fetchAssoc();
+      if (!empty($drupal_block['bid']) && $drupal_block['bid'] != -1) {
+        // One last check for empty content.
+        $block_info = db_select('block', 'b')
+          ->fields('b', array('module', 'delta', 'title'))
+          ->condition('bid', $drupal_block['bid'])
+          ->execute()
+          ->fetchAssoc();
 
-        }
+        if (!empty($block_info['module']) && !empty($block_info['delta'])) {
+          switch ($block_info['module']) {
+            case 'block':
+              $block = block_load('block', $block_info['delta']);
+              $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
+              $ret_val = drupal_render($render_array);
+              break;
 
-        if (!empty($drupal_block['bid']) && $drupal_block['bid'] != -1) {
-          // One last check for empty content.
-          $block_info = db_select('block', 'b')
-            ->fields('b', array('module', 'delta', 'title'))
-            ->condition('bid', $drupal_block['bid'])
-            ->execute()
-            ->fetchAssoc();
-
-          if (!empty($block_info['module']) && !empty($block_info['delta'])) {
-            switch ($block_info['module']) {
-              case 'block':
-                $block = block_load('block', $block_info['delta']);
-                $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
-                $ret_val = drupal_render($render_array);
-                break;
-
-              default:
-                $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
-                if (!empty($block['content'])) {
-                  $ret_val = render($block['content']);
-                }
-                break;
-            }
+            default:
+              $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
+              if (!empty($block['content'])) {
+                $ret_val = render($block['content']);
+              }
+              break;
           }
         }
-
       }
 
     }
