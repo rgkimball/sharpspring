@@ -152,7 +152,6 @@ function ss_contextual_blocks_callback($ss_bid) {
       }
     }
 
-
     $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
       ->fields('sbr')
       ->condition('rule_id', $rule_id)

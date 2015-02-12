@@ -43,7 +43,7 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
     '#title' => 'Rule passes if the lead has',
     '#options' => array(
       'and' => 'All of these field values',
-      'or' => 'Any of these field values'
+      'or' => 'Any of these field values',
     ),
   );
 
@@ -209,7 +209,7 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : 0;
   $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
-  $and_or =  (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
+  $and_or = (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
   unset($rules['and_or']);
   $rules = array(
     'and_or' => $and_or,
@@ -516,7 +516,7 @@ function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : '';
   $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
-  $and_or =  (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
+  $and_or = (!empty($rules['and_or'])) ? $rules['and_or'] : 'and';
   unset($rules['and_or']);
   $rules = array(
     'and_or' => $and_or,
