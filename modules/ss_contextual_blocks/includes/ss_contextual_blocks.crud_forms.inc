@@ -268,7 +268,10 @@ function ss_contextual_blocks_add_rule_remove($form, &$form_state) {
     unset($current_vals['add_rule']);
     unset($current_vals[$remove_num]);
 
-    $new_vals = array();
+    $new_vals = array(
+      'and_or' => (!empty($current_vals['and_or'])) ? $current_vals['and_or'] : 'any',
+    );
+    unset($current_vals['and_or']);
 
     foreach ($current_vals as $rule) {
       $new_vals[] = $rule;
@@ -276,6 +279,15 @@ function ss_contextual_blocks_add_rule_remove($form, &$form_state) {
 
     $form_state['input']['rules_fieldset'] = $new_vals;
     $form_state['num_rules']--;
+
+    if ($form_state['num_rules'] == 0) {
+      // If this is the last rule, clear out the value.
+      $form_state['input']['rules_fieldset'][0] = array(
+        'fieldname' => '',
+        'value' => '',
+      );
+      $form_state['num_rules'] = 1;
+    }
 
   }
 
