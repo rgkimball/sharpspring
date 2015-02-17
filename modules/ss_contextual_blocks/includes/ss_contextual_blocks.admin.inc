@@ -201,17 +201,4 @@ function ss_contextual_blocks_config_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t('SharpSpring Contextual Blocks saved'));
-
-  // Now check the new block field.
-  $new_block_name = (!empty($input_vals['new_block_name'])) ? $input_vals['new_block_name'] : '';
-
-  if (!empty($new_block_name)) {
-    $new_bid = db_insert('sharpspring_contextual_blocks')
-      ->fields(array(
-        'name' => $new_block_name,
-      ))
-      ->execute();
-
-    drupal_set_message('SharpSpring Contextual Block "' . $new_block_name . '" Added.');
-  }
 }
