@@ -18,7 +18,7 @@ function ssContextualBlock(resp) {
       $('.ss-contextual-wrapper').each(function() {
         var this_bid = $(this).attr('ssbid');
 
-        // Perform an ajax call to get the block contents
+        // Perform an ajax call to get the block contents.
         var request = $.ajax({
           type: "POST",
           url: "/sharpspring/contextual/block_callback/" + this_bid,

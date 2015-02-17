@@ -2,7 +2,6 @@
 /**
  * @file
  * Administrative page callbacks for the SharpSpring module.
- *
  */
 
 /**

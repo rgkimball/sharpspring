@@ -2,7 +2,6 @@
 /**
  * @file
  * Admin form handlers for the SharpSpring contextual blocks module.
- *
  */
 
 /**

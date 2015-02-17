@@ -2,7 +2,6 @@
 /**
  * @file
  * Handles Drupal blocks for SharpSpring contextual blocks
- *
  */
 
 /**

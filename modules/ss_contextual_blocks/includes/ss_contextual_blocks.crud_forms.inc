@@ -2,7 +2,6 @@
 /**
  * @file
  * Forms for Creation, Editing, and Deletion of SharpSpring Contextual Rules.
- *
  */
 
 /**

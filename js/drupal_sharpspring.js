@@ -1,9 +1,8 @@
 /**
  * @file
- * Sharpspring specific javascript
+ * Sharpspring specific javascript.
  *
  */
-
 /**
  * Handles sharpspring response.
  *
