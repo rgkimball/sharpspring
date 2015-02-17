@@ -217,7 +217,7 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   $rules = json_encode($rules);
 
   $new_rule = _ss_contextual_blocks_insert_rule($rules, $name, $description);
-  drupal_set_message('SharpSpring rule ' . $name . ' saved.');
+  drupal_set_message(t('SharpSpring rule @name saved.'), array('@name' => $name));
 
   $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_rule/' . $new_rule;
 }
@@ -368,7 +368,7 @@ function ss_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
       ->condition('rule_id', $form_state['input']['rule_id'])
       ->execute();
 
-    drupal_set_message('SharpSpring Contextual Rule ' . $rule_name . ' deleted');
+    drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted'), array('@rule_name' => $rule_name));
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 }
@@ -426,7 +426,7 @@ function ss_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
   }
   else {
     // This block does not exist, redirect back to the admin page.
-    drupal_set_message('Unknown block number, unable to delete.', 'error');
+    drupal_set_message(t('Unknown block number, unable to delete.'), 'error');
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 
@@ -454,7 +454,7 @@ function ss_contextual_blocks_delete_block_form_submit($form, &$form_state) {
       ->condition('ss_bid', $form_state['input']['ss_bid'])
       ->execute();
 
-    drupal_set_message('SharpSpring block ' . $block_name . ' deleted');
+    drupal_set_message(t('SharpSpring block @block_name deleted'), array('@block_name' => $block_name));
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 }
@@ -507,7 +507,7 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
   }
   else {
     // This rule does not exist, redirect back to the admin page.
-    drupal_set_message('Unknown rule.', 'error');
+    drupal_set_message(t('Unknown rule.'), 'error');
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 
@@ -538,7 +538,7 @@ function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
 
   if (!empty($rule_id) && is_numeric($rule_id)) {
     _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description);
-    drupal_set_message('SharpSpring rule updated.');
+    drupal_set_message(t('SharpSpring rule updated.'));
   }
 }
 
@@ -633,6 +633,6 @@ function ss_contextual_blocks_edit_block_form_submit($form, &$form_state) {
 
   if (!empty($ss_bid) && !empty($name) && !empty($description)) {
     _ss_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);
-    drupal_set_message('SharpSpring block ' . $name . ' updated.');
+    drupal_set_message(t('SharpSpring block @name updated.'), array('@name' => $name));
   }
 }
