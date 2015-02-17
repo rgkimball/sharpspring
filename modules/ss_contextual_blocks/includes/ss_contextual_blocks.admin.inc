@@ -192,7 +192,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
  */
 function ss_contextual_blocks_config_form_submit($form, &$form_state) {
   // First save the existing block information.
-  $input_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $input_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
 
   if (!empty($input_vals['data_table'])) {
     foreach ($input_vals['data_table'] as $data_id => $value) {
