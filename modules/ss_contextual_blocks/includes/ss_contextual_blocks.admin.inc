@@ -183,32 +183,6 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
 }
 
 /**
- * Validation for the contextual blocks config form.
- *
- * @param array $form
- *   An array representing the current form.
- * @param array $form_state
- *   An array of the submitted values for the form.
- */
-function ss_contextual_blocks_config_form_validate($form, &$form_state) {
-  $new_block = (!empty($form_state['input']['new_block_name'])) ? $form_state['input']['new_block_name'] : '';
-
-  if (!empty($new_block)) {
-    $exists = db_select('sharpspring_contextual_blocks', 'scb')
-      ->fields('scb')
-      ->condition('name', $new_block)
-      ->execute()
-      ->fetchCol();
-
-    if (!empty($exists)) {
-      // This block name already exists.
-      form_set_error('new_block_name', 'This SharpSpring block name already exists.');
-    }
-  }
-
-}
-
-/**
  * Submit handler for the contextual blocks config form.
  *
  * @param array $form
