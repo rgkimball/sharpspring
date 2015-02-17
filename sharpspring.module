@@ -6,9 +6,6 @@
  * Adds the required Javascript to all your Drupal pages to allow tracking by
  * the SharpSpring statistics package.
  *
- * @author: rgkimball
- * @author: choicelildice
- * @author: mojiferous
  */
 
 /**

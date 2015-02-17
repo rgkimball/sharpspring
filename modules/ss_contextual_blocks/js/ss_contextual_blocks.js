@@ -2,7 +2,6 @@
  * @file
  * Contextual Block handler javascript.
  *
- * @author: Mojiferous
  */
 
 /**

@@ -2,7 +2,6 @@
  * @file
  * Sharpspring specific javascript
  *
- * @author: Mojiferous
  */
 
 /**

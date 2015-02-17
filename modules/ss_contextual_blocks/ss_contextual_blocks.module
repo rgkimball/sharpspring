@@ -6,7 +6,6 @@
  * Provides contextual content blocks that respond
  * to SharpSpring lead or contact fields.
  *
- * @author: mojiferous
  */
 
 module_load_include('inc', 'ss_contextual_blocks', 'includes/ss_contextual_blocks.blocks');
