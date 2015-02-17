@@ -165,7 +165,6 @@ function ss_contextual_blocks_callback($ss_bid) {
       if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
         // The user has selected 'default' as the content.
         // Load the default rule for this SS block.
-
         $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
           ->fields('sbr')
           ->condition('rule_id', 0)

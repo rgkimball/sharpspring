@@ -30,7 +30,6 @@ function ss_contextual_blocks_block_view($delta = '') {
 
   if (strpos($delta, 'ss_contextual_block_') === 0) {
     // This is a SharpSpring contextual block.
-
     $bid = str_replace('ss_contextual_block_', '', $delta);
 
     $block['subject'] = '';
