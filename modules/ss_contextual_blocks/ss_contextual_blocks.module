@@ -473,7 +473,7 @@ function _ss_contextual_blocks_update_rule_weight($data_id, $weight) {
     ->fields(array(
       'weight' => $weight,
     ))
-    ->condition('data_id', $data_id)
+    ->condition('rule_id', $data_id)
     ->execute();
 
 }
