@@ -345,7 +345,7 @@ function ss_contextual_blocks_delete_rule_form($form, &$form_state, $rule_id) {
   }
   else {
     // This rule does not exist, redirect back to the admin page.
-    drupal_set_message('Unknown rule number, unable to delete.', 'error');
+    drupal_set_message(t('Unknown rule number, unable to delete.'), 'error');
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 
