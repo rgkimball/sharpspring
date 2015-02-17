@@ -361,11 +361,11 @@ function ss_contextual_blocks_delete_rule_form($form, &$form_state, $rule_id) {
  *   An array of submitted form values.
  */
 function ss_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
-  if (!empty($form_state['input']['rule_id']) && is_numeric($form_state['input']['rule_id'])) {
-    $rule_name = (!empty($form_state['input']['rule_name'])) ? $form_state['input']['rule_name'] : '';
+  if (!empty($form_state['values']['rule_id']) && is_numeric($form_state['values']['rule_id'])) {
+    $rule_name = (!empty($form_state['values']['rule_name'])) ? $form_state['values']['rule_name'] : '';
 
     $deleted = db_delete('sharpspring_contextual_block_rules')
-      ->condition('rule_id', $form_state['input']['rule_id'])
+      ->condition('rule_id', $form_state['values']['rule_id'])
       ->execute();
 
     drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted'), array('@rule_name' => $rule_name));
@@ -442,16 +442,16 @@ function ss_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
  *   An array of submitted form values.
  */
 function ss_contextual_blocks_delete_block_form_submit($form, &$form_state) {
-  if (!empty($form_state['input']['ss_bid']) && is_numeric($form_state['input']['ss_bid'])) {
-    $block_name = (!empty($form_state['input']['block_name'])) ? $form_state['input']['block_name'] : '';
+  if (!empty($form_state['values']['ss_bid']) && is_numeric($form_state['values']['ss_bid'])) {
+    $block_name = (!empty($form_state['values']['block_name'])) ? $form_state['values']['block_name'] : '';
 
     db_delete('sharpspring_contextual_blocks')
-      ->condition('ss_bid', $form_state['input']['ss_bid'])
+      ->condition('ss_bid', $form_state['values']['ss_bid'])
       ->execute();
 
     // Also delete all rules associated with this block.
     db_delete('sharpspring_contextual_block_reactions')
-      ->condition('ss_bid', $form_state['input']['ss_bid'])
+      ->condition('ss_bid', $form_state['values']['ss_bid'])
       ->execute();
 
     drupal_set_message(t('SharpSpring block @block_name deleted'), array('@block_name' => $block_name));
@@ -523,7 +523,7 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
  *   An array representing the current form state.
  */
 function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
-  $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : '';
   $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
@@ -568,7 +568,7 @@ function ss_contextual_blocks_add_block_form($form, &$form_state) {
  *   An array representing the current form state.
  */
 function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
-  $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['block_name'])) ? $new_vals['block_name'] : '';
   $description = (!empty($new_vals['block_description'])) ? $new_vals['block_description'] : '';
   $reactions = (!empty($new_vals['reactions'])) ? $new_vals['reactions'] : array();
@@ -625,7 +625,7 @@ function ss_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
  *   An array representing the current form state.
  */
 function ss_contextual_blocks_edit_block_form_submit($form, &$form_state) {
-  $values = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $values = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $ss_bid = (!empty($values['ss_bid'])) ? $values['ss_bid'] : 0;
   $name = (!empty($values['block_name'])) ? $values['block_name'] : '';
   $description = (!empty($values['block_description'])) ? $values['block_description'] : '';
