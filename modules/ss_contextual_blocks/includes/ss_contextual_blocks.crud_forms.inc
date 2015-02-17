@@ -41,8 +41,8 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
     '#type' => 'select',
     '#title' => 'Rule passes if the lead has',
     '#options' => array(
-      'and' => 'All of these field values',
-      'or' => 'Any of these field values',
+      'and' => t('All of these field values'),
+      'or' => t('Any of these field values'),
     ),
   );
 
