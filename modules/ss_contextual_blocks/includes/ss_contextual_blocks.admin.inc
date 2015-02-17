@@ -8,9 +8,9 @@
  * Defines the block config form.
  *
  * @param array $form
- *   An array containing form values
+ *   An array containing form values.
  * @param array $form_state
- *   An array containing current form state values
+ *   An array containing current form state values.
  *
  * @return array
  *   The final form array

@@ -1,7 +1,6 @@
 /**
  * @file
  * Contextual Block handler javascript.
- *
  */
 
 /**

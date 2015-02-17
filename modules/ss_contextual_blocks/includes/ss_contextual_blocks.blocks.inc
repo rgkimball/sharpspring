@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Handles Drupal blocks for SharpSpring contextual blocks
+ * Handles Drupal blocks for SharpSpring contextual blocks.
  */
 
 /**
