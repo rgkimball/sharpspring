@@ -204,7 +204,7 @@ function ss_contextual_blocks_add_rule_form($form, &$form_state) {
  *   An array representing the submitted form state.
  */
 function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
-  $new_vals = (!empty($form_state['input'])) ? $form_state['input'] : array();
+  $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : 0;
   $rules = (!empty($new_vals['rules_fieldset'])) ? $new_vals['rules_fieldset'] : array();
