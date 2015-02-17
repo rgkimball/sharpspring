@@ -482,7 +482,6 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
 
     if (empty($form_state['num_rules'])) {
       // If this is the first load of the form, set up the default rules.
-
       if (count($rules) > 0) {
         $form_state['num_rules'] = (!empty($rules)) ? count($rules) : 0;
       }
@@ -575,7 +574,7 @@ function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
 
   if (!empty($name) && !empty($description)) {
     $new_bid = _ss_contextual_blocks_insert_block($name, $description, $reactions);
-    drupal_set_message('SharpSpring block ' . $name . ' saved.');
+    drupal_set_message(t('SharpSpring block @name saved.'), array('@name' => $name));
     $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_block/' . $new_bid;
   }
 }
