@@ -254,14 +254,15 @@ function ss_webforms_config_form_submit(&$form, &$form_state) {
     }
 
     // Now save new info.
-    db_insert('sharpspring_webforms')
-      ->fields(array(
-        'nid' => check_plain($wid),
-        'base_uri' => check_plain($base_uri),
-        'endpoint' => check_plain($endpoint),
-        'status' => check_plain($status),
-      ))
-      ->execute();
+    $db_name = 'sharpspring_webforms';
+    $data = array(
+      'nid' => check_plain($wid),
+      'base_uri' => check_plain($base_uri),
+      'endpoint' => check_plain($endpoint),
+      'status' => check_plain($status),
+    );
+
+    drupal_write_record($db_name, $data);
 
     $webform = node_load($wid);
     if ($status == 1) {
