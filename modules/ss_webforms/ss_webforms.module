@@ -184,6 +184,7 @@ function ss_webforms_config_form($form, &$form_state) {
     '#default_value' => $forms_count,
   );
 
+  $form['#submit'][] = 'ss_webforms_config_form_submit';
   return system_settings_form($form);
 }
 
@@ -199,7 +200,6 @@ function ss_webforms_config_form_validate(&$form, &$form_state) {
   // Only get numeric array keys within webforms group (i.e. webform nids).
   $keys = array_filter(array_keys($form['tracking']['webforms']), 'is_int');
 
-  $i = 0;
   foreach ($keys as $wid) {
 
     $status = $form['tracking']['webforms']['enable'][$wid]['#value'];
@@ -218,43 +218,54 @@ function ss_webforms_config_form_validate(&$form, &$form_state) {
         continue;
       }
     }
+  }
+}
 
-    if (isset($wid) && isset($status) && isset($base_uri) && isset($endpoint)) {
+/**
+ * SharpSpring Webform admin form submit.
+ *
+ * @param array $form
+ *   An array defining the form.
+ * @param array $form_state
+ *   An array defining the current state of the form.
+ */
+function ss_webforms_config_form_submit(&$form, &$form_state) {
+  // Only get numeric array keys within webforms group (i.e. webform nids).
+  $keys = array_filter(array_keys($form['tracking']['webforms']), 'is_int');
 
-      $result_check = db_select('sharpspring_webforms', 'nid')
-        ->fields('nid')
-        ->condition('nid', $wid, '=')
-        ->execute();
+  foreach ($keys as $wid) {
 
-      // If there's any results, delete them.
-      foreach ($result_check as $result) {
-        if (!empty($result)) {
-          db_delete('sharpspring_webforms')
-            ->condition('nid', $wid, '=')
-            ->execute();
-        }
-      }
+    $status = $form['tracking']['webforms']['enable'][$wid]['#value'];
+    $base_uri = $form['tracking']['webforms'][$wid]['base_uri_' . $wid]['#value'];
+    $endpoint = $form['tracking']['webforms'][$wid]['endpoint_' . $wid]['#value'];
 
-      // Now save new info.
-      db_insert('sharpspring_webforms')
-        ->fields(array(
-          'nid' => check_plain($wid),
-          'base_uri' => check_plain($base_uri),
-          'endpoint' => check_plain($endpoint),
-          'status' => check_plain($status),
-        ))
-        ->execute();
+    $result_check = db_select('sharpspring_webforms', 'nid')
+      ->fields('nid')
+      ->condition('nid', $wid, '=')
+      ->execute();
 
-      $webform = node_load($wid);
-
-      if ($status == 1) {
-        drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title)));
+    // If there's any results, delete them.
+    foreach ($result_check as $result) {
+      if (!empty($result)) {
+        db_delete('sharpspring_webforms')
+          ->condition('nid', $wid, '=')
+          ->execute();
       }
     }
-    else {
-      form_set_error($wid, t('Unable to save form data for @id'), array('@id' => $wid));
-    }
 
-    $i++;
+    // Now save new info.
+    db_insert('sharpspring_webforms')
+      ->fields(array(
+        'nid' => check_plain($wid),
+        'base_uri' => check_plain($base_uri),
+        'endpoint' => check_plain($endpoint),
+        'status' => check_plain($status),
+      ))
+      ->execute();
+
+    $webform = node_load($wid);
+    if ($status == 1) {
+      drupal_set_message(t('Successfully saved data for @title form', array('@title' => $webform->title)));
+    }
   }
 }
