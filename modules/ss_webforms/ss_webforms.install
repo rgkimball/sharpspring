@@ -5,15 +5,6 @@
  */
 
 /**
- * Implements hook_uninstall().
- */
-function ss_webforms_uninstall() {
-  if (db_table_exists('sharpspring_webform')) {
-    db_query('DROP TABLE {sharpspring}');
-  }
-}
-
-/**
  * Implements hook_schema().
  */
 function ss_webforms_schema() {
