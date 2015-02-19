@@ -53,7 +53,8 @@ function sharpspring_webforms_form_alter(&$form, &$form_state, $form_id) {
           'scope' => 'footer',
           'preprocessed' => FALSE,
           'type' => 'external',
-          'weight' => 3));
+          'weight' => 3
+        ));
 
         $has_added_form_js = TRUE;
       }
@@ -103,23 +104,16 @@ function sharpspring_webforms_config_form($form, &$form_state) {
     ->execute();
 
   // Get list of all SharpSpring form endpoints.
-  if (db_table_exists('sharpspring_webforms')) {
-    $ss_query = db_select('sharpspring_webforms', 'nid')
-      ->fields('nid')
-      ->orderBy('nid', 'ASC')
-      ->execute();
+  $ss_query = db_select('sharpspring_webforms', 'nid')
+    ->fields('nid')
+    ->orderBy('nid', 'ASC')
+    ->execute();
 
-    $webform_codes = array();
-    foreach ($ss_query as $row) {
-      $webform_codes[$row->nid] = $row;
-    }
-
+  $webform_codes = array();
+  foreach ($ss_query as $row) {
+    $webform_codes[$row->nid] = $row;
   }
-  else {
-    drupal_set_message(t('SharpSpring Webforms DB Table does not exist. Please disable and re-enable the module before using webform components.'), 'error');
-    exit();
-  }
-
+  
   $forms_count = 0;
   foreach ($wf_query as $row) {
     $forms_count++;
