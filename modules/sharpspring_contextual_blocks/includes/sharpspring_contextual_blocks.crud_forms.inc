@@ -482,7 +482,7 @@ function sharpspring_contextual_blocks_edit_rule_form($form, &$form_state, $rule
     if (empty($form_state['num_rules'])) {
       // If this is the first load of the form, set up the default rules.
       if (count($rules) > 0) {
-        $form_state['num_rules'] = (!empty($rules)) ? count($rules) : 0;
+        $form_state['num_rules'] = (!empty($rules)) ? count($rules) - 1 : 0;
       }
     }
 
