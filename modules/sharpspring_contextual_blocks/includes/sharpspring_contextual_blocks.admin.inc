@@ -79,6 +79,22 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
     '#attributes' => array('id' => 'ss-block-order'),
   );
 
+  return $form;
+}
+
+/**
+ * Defines the block rules config form.
+ *
+ * @param array $form
+ *   An array containing form values.
+ * @param array $form_state
+ *   An array containing current form state values.
+ *
+ * @return array
+ *   The final form array
+ */
+function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
+
   $form['rules_table'] = array(
     '#type' => 'fieldset',
     '#title' => 'SharpSpring Contextual Rules',
