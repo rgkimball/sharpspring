@@ -31,7 +31,7 @@ function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
 
   $form['rules_fieldset'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Rules'),
+    '#title' => t('Conditions'),
     '#prefix' => '<div id="rules-fieldset-wrapper">',
     '#suffix' => '</div>',
   );
@@ -91,7 +91,7 @@ function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
 
   $form['rules_fieldset']['add_rule'] = array(
     '#type' => 'submit',
-    '#value' => t('Add Rule'),
+    '#value' => t('Add Condition'),
     '#submit' => array('sharpspring_contextual_blocks_add_rule_add_more'),
     '#ajax' => array(
       'callback' => 'sharpspring_contextual_blocks_add_more_callback',
