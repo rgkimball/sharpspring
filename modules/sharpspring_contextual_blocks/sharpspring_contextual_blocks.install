@@ -7,7 +7,7 @@
 /**
  * Implements hook_schema().
  */
-function ss_contextual_blocks_schema() {
+function sharpspring_contextual_blocks_schema() {
   $schema['sharpspring_contextual_blocks'] = array(
     'description' => 'Stores SharpSpring contextual block definitions',
     'fields' => array(

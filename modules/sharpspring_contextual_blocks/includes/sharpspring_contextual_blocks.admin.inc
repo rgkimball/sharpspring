@@ -15,8 +15,8 @@
  * @return array
  *   The final form array
  */
-function ss_contextual_blocks_config_form($form, &$form_state) {
-  $ss_blocks = _ss_contextual_blocks_return_all_drupal_blocks();
+function sharpspring_contextual_blocks_config_form($form, &$form_state) {
+  $ss_blocks = _sharpspring_contextual_blocks_return_all_drupal_blocks();
 
   $form['block_table'] = array(
     '#type' => 'fieldset',
@@ -92,7 +92,7 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
   );
 
   // Load the custom rules.
-  $contents = _ss_contextual_blocks_return_all_ss_rules();
+  $contents = _sharpspring_contextual_blocks_return_all_sharpspring_rules();
 
   $rows = array();
   $row_elements = array();
@@ -189,13 +189,13 @@ function ss_contextual_blocks_config_form($form, &$form_state) {
  * @param array $form_state
  *   An array of submitted values for the form.
  */
-function ss_contextual_blocks_config_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_config_form_submit($form, &$form_state) {
   // First save the existing block information.
   $input_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
 
   if (!empty($input_vals['data_table'])) {
     foreach ($input_vals['data_table'] as $data_id => $value) {
-      _ss_contextual_blocks_update_rule_weight($data_id, $value);
+      _sharpspring_contextual_blocks_update_rule_weight($data_id, $value);
     }
   }
 

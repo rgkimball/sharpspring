@@ -12,7 +12,7 @@
  * @param array $form_state
  *   An array representing the current form state.
  */
-function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
+function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
   $form['#tree'] = TRUE;
 
   $form['name'] = array(
@@ -74,9 +74,9 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
       '#type' => 'submit',
       '#value' => t('Remove'),
       '#name' => 'remove_' . $n,
-      '#submit' => array('ss_contextual_blocks_add_rule_remove'),
+      '#submit' => array('sharpspring_contextual_blocks_add_rule_remove'),
       '#ajax' => array(
-        'callback' => 'ss_contextual_blocks_add_more_callback',
+        'callback' => 'sharpspring_contextual_blocks_add_more_callback',
         'wrapper' => 'rules-fieldset-wrapper',
       ),
       '#prefix' => '<td>',
@@ -92,9 +92,9 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
   $form['rules_fieldset']['add_rule'] = array(
     '#type' => 'submit',
     '#value' => t('Add Rule'),
-    '#submit' => array('ss_contextual_blocks_add_rule_add_more'),
+    '#submit' => array('sharpspring_contextual_blocks_add_rule_add_more'),
     '#ajax' => array(
-      'callback' => 'ss_contextual_blocks_add_more_callback',
+      'callback' => 'sharpspring_contextual_blocks_add_more_callback',
       'wrapper' => 'rules-fieldset-wrapper',
     ),
   );
@@ -111,7 +111,7 @@ function _ss_contextual_blocks_set_rule_form(&$form, &$form_state) {
  * @param array $form
  *   An array of form elements.
  */
-function _ss_contextual_set_block_form(&$form) {
+function _sharpspring_contextual_set_block_form(&$form) {
   $form['#tree'] = TRUE;
 
   $form['block_name'] = array(
@@ -138,7 +138,7 @@ function _ss_contextual_set_block_form(&$form) {
     '#markup' => '<table><tr><th>SharpSpring Rule</th><th>Block Shown</th></tr>',
   );
 
-  $blocks = _ss_contextual_block_get_all_blocks();
+  $blocks = _sharpspring_contextual_block_get_all_blocks();
   $blocks[-1] = '- None -';
   ksort($blocks);
 
@@ -149,7 +149,7 @@ function _ss_contextual_set_block_form(&$form) {
     '#suffix' => '</td></tr>',
   );
 
-  $current_rules = _ss_contextual_blocks_return_all_ss_rules();
+  $current_rules = _sharpspring_contextual_blocks_return_all_sharpspring_rules();
   $blocks[0] = '- Default -';
   ksort($blocks);
 
@@ -188,8 +188,8 @@ function _ss_contextual_set_block_form(&$form) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_add_rule_form($form, &$form_state) {
-  _ss_contextual_blocks_set_rule_form($form, $form_state);
+function sharpspring_contextual_blocks_add_rule_form($form, &$form_state) {
+  _sharpspring_contextual_blocks_set_rule_form($form, $form_state);
 
   return $form;
 }
@@ -202,7 +202,7 @@ function ss_contextual_blocks_add_rule_form($form, &$form_state) {
  * @param array $form_state
  *   An array representing the submitted form state.
  */
-function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : 0;
@@ -215,8 +215,8 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
   );
   $rules = json_encode($rules);
 
-  $new_rule = _ss_contextual_blocks_insert_rule($rules, $name, $description);
-  drupal_set_message(t('SharpSpring rule @name saved.'), array('@name' => $name));
+  $new_rule = _sharpspring_contextual_blocks_insert_rule($rules, $name, $description);
+  drupal_set_message(t('SharpSpring rule @name saved.', array('@name' => $name)));
 
   $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_rule/' . $new_rule;
 }
@@ -232,7 +232,7 @@ function ss_contextual_blocks_add_rule_form_submit($form, &$form_state) {
  * @return array
  *   Returns form element for rules fieldset.
  */
-function ss_contextual_blocks_add_more_callback($form, $form_state) {
+function sharpspring_contextual_blocks_add_more_callback($form, $form_state) {
   return $form['rules_fieldset'];
 }
 
@@ -244,7 +244,7 @@ function ss_contextual_blocks_add_more_callback($form, $form_state) {
  * @param array $form_state
  *   Array representing the current form state.
  */
-function ss_contextual_blocks_add_rule_add_more($form, &$form_state) {
+function sharpspring_contextual_blocks_add_rule_add_more($form, &$form_state) {
   $form_state['num_rules']++;
   $form_state['rebuild'] = TRUE;
 }
@@ -257,7 +257,7 @@ function ss_contextual_blocks_add_rule_add_more($form, &$form_state) {
  * @param array $form_state
  *   Array representing the current form state.
  */
-function ss_contextual_blocks_add_rule_remove($form, &$form_state) {
+function sharpspring_contextual_blocks_add_rule_remove($form, &$form_state) {
   $remove_num = (isset($form_state['triggering_element']['#parents'][1])) ? $form_state['triggering_element']['#parents'][1] : '';
 
   if (is_numeric($remove_num)) {
@@ -305,7 +305,7 @@ function ss_contextual_blocks_add_rule_remove($form, &$form_state) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_delete_rule_form($form, &$form_state, $rule_id) {
+function sharpspring_contextual_blocks_delete_rule_form($form, &$form_state, $rule_id) {
   $exists = db_select('sharpspring_contextual_block_rules', 'sbr')
     ->fields('sbr', array('name'))
     ->condition('rule_id', $rule_id)
@@ -359,7 +359,7 @@ function ss_contextual_blocks_delete_rule_form($form, &$form_state, $rule_id) {
  * @param array $form_state
  *   An array of submitted form values.
  */
-function ss_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['rule_id']) && is_numeric($form_state['values']['rule_id'])) {
     $rule_name = (!empty($form_state['values']['rule_name'])) ? $form_state['values']['rule_name'] : '';
 
@@ -385,7 +385,7 @@ function ss_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
+function sharpspring_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
   $exists = db_select('sharpspring_contextual_blocks', 'scb')
     ->fields('scb')
     ->condition('ss_bid', $ss_bid)
@@ -440,7 +440,7 @@ function ss_contextual_blocks_delete_block_form($form, &$form_state, $ss_bid) {
  * @param array $form_state
  *   An array of submitted form values.
  */
-function ss_contextual_blocks_delete_block_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['ss_bid']) && is_numeric($form_state['values']['ss_bid'])) {
     $block_name = (!empty($form_state['values']['block_name'])) ? $form_state['values']['block_name'] : '';
 
@@ -471,8 +471,8 @@ function ss_contextual_blocks_delete_block_form_submit($form, &$form_state) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
-  $this_rule = _ss_contextual_blocks_return_rule_from_data_id($rule_id);
+function sharpspring_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
+  $this_rule = _sharpspring_contextual_blocks_return_rule_from_data_id($rule_id);
 
   if (!empty($this_rule)) {
     $raw_rules = (!empty($this_rule['segment_rule'])) ? json_decode($this_rule['segment_rule'], TRUE) : array();
@@ -486,7 +486,7 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
       }
     }
 
-    _ss_contextual_blocks_set_rule_form($form, $form_state);
+    _sharpspring_contextual_blocks_set_rule_form($form, $form_state);
 
     $form['name']['#default_value'] = (!empty($this_rule['name'])) ? $this_rule['name'] : '';
     $form['description']['#default_value'] = (!empty($this_rule['description'])) ? $this_rule['description'] : '';
@@ -520,7 +520,7 @@ function ss_contextual_blocks_edit_rule_form($form, &$form_state, $rule_id) {
  * @param array $form_state
  *   An array representing the current form state.
  */
-function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['name'])) ? $new_vals['name'] : '';
   $description = (!empty($new_vals['description'])) ? $new_vals['description'] : '';
@@ -535,7 +535,7 @@ function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
   $rule_id = (!empty($new_vals['rule_id'])) ? $new_vals['rule_id'] : 0;
 
   if (!empty($rule_id) && is_numeric($rule_id)) {
-    _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description);
+    _sharpspring_contextual_blocks_update_rule($rule_id, $rules, $name, $description);
     drupal_set_message(t('SharpSpring rule updated.'));
   }
 }
@@ -551,8 +551,8 @@ function ss_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_add_block_form($form, &$form_state) {
-  _ss_contextual_set_block_form($form);
+function sharpspring_contextual_blocks_add_block_form($form, &$form_state) {
+  _sharpspring_contextual_set_block_form($form);
 
   return $form;
 }
@@ -565,14 +565,14 @@ function ss_contextual_blocks_add_block_form($form, &$form_state) {
  * @param array $form_state
  *   An array representing the current form state.
  */
-function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $name = (!empty($new_vals['block_name'])) ? $new_vals['block_name'] : '';
   $description = (!empty($new_vals['block_description'])) ? $new_vals['block_description'] : '';
   $reactions = (!empty($new_vals['reactions'])) ? $new_vals['reactions'] : array();
 
   if (!empty($name) && !empty($description)) {
-    $new_bid = _ss_contextual_blocks_insert_block($name, $description, $reactions);
+    $new_bid = _sharpspring_contextual_blocks_insert_block($name, $description, $reactions);
     drupal_set_message(t('SharpSpring block @name saved.'), array('@name' => $name));
     $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_block/' . $new_bid;
   }
@@ -591,11 +591,11 @@ function ss_contextual_blocks_add_block_form_submit($form, &$form_state) {
  * @return array
  *   The current form.
  */
-function ss_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
-  _ss_contextual_set_block_form($form);
+function sharpspring_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
+  _sharpspring_contextual_set_block_form($form);
 
-  $this_block = _ss_contextual_blocks_return_block_from_block_id($ss_bid);
-  $reactions = _ss_contextual_blocks_return_reactions_from_block_id($ss_bid);
+  $this_block = _sharpspring_contextual_blocks_return_block_from_block_id($ss_bid);
+  $reactions = _sharpspring_contextual_blocks_return_reactions_from_block_id($ss_bid);
 
   $form['block_name']['#default_value'] = (!empty($this_block['name'])) ? $this_block['name'] : '';
   $form['block_description']['#default_value'] = (!empty($this_block['description'])) ? $this_block['description'] : '';
@@ -622,7 +622,7 @@ function ss_contextual_blocks_edit_block_form($form, &$form_state, $ss_bid) {
  * @param array $form_state
  *   An array representing the current form state.
  */
-function ss_contextual_blocks_edit_block_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_edit_block_form_submit($form, &$form_state) {
   $values = (!empty($form_state['values'])) ? $form_state['values'] : array();
   $ss_bid = (!empty($values['ss_bid'])) ? $values['ss_bid'] : 0;
   $name = (!empty($values['block_name'])) ? $values['block_name'] : '';
@@ -630,7 +630,7 @@ function ss_contextual_blocks_edit_block_form_submit($form, &$form_state) {
   $reactions = (!empty($values['reactions'])) ? $values['reactions'] : array();
 
   if (!empty($ss_bid) && !empty($name) && !empty($description)) {
-    _ss_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);
-    drupal_set_message(t('SharpSpring block @name updated.'), array('@name' => $name));
+    _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);
+    drupal_set_message(t('SharpSpring block @name updated.', array('@name' => $name)));
   }
 }

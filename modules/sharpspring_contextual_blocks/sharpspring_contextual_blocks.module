@@ -7,19 +7,19 @@
  * to SharpSpring lead or contact fields.
  */
 
-module_load_include('inc', 'ss_contextual_blocks', 'includes/ss_contextual_blocks.blocks');
+module_load_include('inc', 'sharpspring_contextual_blocks', 'includes/sharpspring_contextual_blocks.blocks');
 
 /**
  * Implements hook_menu().
  */
-function ss_contextual_blocks_menu() {
+function sharpspring_contextual_blocks_menu() {
   $items['admin/config/system/sharpspring/blocks'] = array(
     'title' => 'Contextual Blocks',
     'description' => 'Configure SharpSpring contextual content blocks.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_config_form'),
+    'page arguments' => array('sharpspring_contextual_blocks_config_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.admin.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
@@ -27,7 +27,7 @@ function ss_contextual_blocks_menu() {
   $items['sharpspring/contextual/block_callback/%'] = array(
     'title' => 'Return block contents',
     'description' => 'Returns the contents of a SharpSpring contextual block',
-    'page callback' => 'ss_contextual_blocks_callback',
+    'page callback' => 'sharpspring_contextual_blocks_callback',
     'page arguments' => array(3),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
@@ -37,9 +37,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Add new SharpSpring contextual rule',
     'description' => 'Provides a form to add a new SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_add_rule_form'),
+    'page arguments' => array('sharpspring_contextual_blocks_add_rule_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -47,9 +47,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Delete SharpSpring contextual rule',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_delete_rule_form', 6),
+    'page arguments' => array('sharpspring_contextual_blocks_delete_rule_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -57,9 +57,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Edit SharpSpring contextual rule',
     'description' => 'Provides a form to edit a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_edit_rule_form', 6),
+    'page arguments' => array('sharpspring_contextual_blocks_edit_rule_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -67,9 +67,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Add new SharpSpring contextual block',
     'description' => 'Provides a form to add a new SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_add_block_form'),
+    'page arguments' => array('sharpspring_contextual_blocks_add_block_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -77,9 +77,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Delete SharpSpring contextual block',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_delete_block_form', 6),
+    'page arguments' => array('sharpspring_contextual_blocks_delete_block_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -87,9 +87,9 @@ function ss_contextual_blocks_menu() {
     'title' => 'Edit SharpSpring contextual block',
     'description' => 'Provides a form to edit a SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ss_contextual_blocks_edit_block_form', 6),
+    'page arguments' => array('sharpspring_contextual_blocks_edit_block_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/ss_contextual_blocks.crud_forms.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -102,7 +102,7 @@ function ss_contextual_blocks_menu() {
  * @param int $ss_bid
  *   An integer indicating the internal sharpspring block id.
  */
-function ss_contextual_blocks_callback($ss_bid) {
+function sharpspring_contextual_blocks_callback($ss_bid) {
   $ret_val = '';
 
   $rules = db_select('sharpspring_contextual_block_rules', 'sbd')
@@ -215,7 +215,7 @@ function ss_contextual_blocks_callback($ss_bid) {
  * @return array
  *   Returns array keyed by block id, values is an object of field values.
  */
-function _ss_contextual_blocks_return_all_drupal_blocks() {
+function _sharpspring_contextual_blocks_return_all_drupal_blocks() {
   if (db_table_exists('sharpspring_contextual_blocks')) {
     $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
       ->fields('scb')
@@ -235,7 +235,7 @@ function _ss_contextual_blocks_return_all_drupal_blocks() {
  * @return array
  *   Returns array of rules.
  */
-function _ss_contextual_blocks_return_all_ss_rules() {
+function _sharpspring_contextual_blocks_return_all_sharpspring_rules() {
   $ret_val = array();
 
   $rules = db_select('sharpspring_contextual_block_rules', 'sbr')
@@ -270,7 +270,7 @@ function _ss_contextual_blocks_return_all_ss_rules() {
  * @param string $description
  *   Description of the rule.
  */
-function _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description) {
+function _sharpspring_contextual_blocks_update_rule($rule_id, $rules, $name, $description) {
   if (is_numeric($rule_id)) {
     db_update('sharpspring_contextual_block_rules')
       ->fields(array(
@@ -295,7 +295,7 @@ function _ss_contextual_blocks_update_rule($rule_id, $rules, $name, $description
  * @param array $reactions
  *   Array of block reactions.
  */
-function _ss_contextual_blocks_update_block($ss_bid, $name, $description, $reactions) {
+function _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, $reactions) {
   if (is_numeric($ss_bid)) {
     db_update('sharpspring_contextual_blocks')
       ->fields(array(
@@ -339,7 +339,7 @@ function _ss_contextual_blocks_update_block($ss_bid, $name, $description, $react
  * @return int
  *   Returns id of new rule.
  */
-function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
+function _sharpspring_contextual_blocks_insert_rule($rules, $name, $description) {
   $new_id = db_insert('sharpspring_contextual_block_rules')
     ->fields(array(
       'segment_rule' => $rules,
@@ -364,7 +364,7 @@ function _ss_contextual_blocks_insert_rule($rules, $name, $description) {
  * @return int
  *   Returns the inserted block id.
  */
-function _ss_contextual_blocks_insert_block($name, $description, $reactions) {
+function _sharpspring_contextual_blocks_insert_block($name, $description, $reactions) {
   $new_bid = db_insert('sharpspring_contextual_blocks')
     ->fields(array(
       'name' => $name,
@@ -398,7 +398,7 @@ function _ss_contextual_blocks_insert_block($name, $description, $reactions) {
  * @return array
  *   Associative array of field values for the passed rule.
  */
-function _ss_contextual_blocks_return_rule_from_data_id($rule_id) {
+function _sharpspring_contextual_blocks_return_rule_from_data_id($rule_id) {
   $ret_val = array();
 
   if (is_numeric($rule_id)) {
@@ -421,7 +421,7 @@ function _ss_contextual_blocks_return_rule_from_data_id($rule_id) {
  * @return array
  *   Associative array of field values for the passed block.
  */
-function _ss_contextual_blocks_return_block_from_block_id($ss_bid) {
+function _sharpspring_contextual_blocks_return_block_from_block_id($ss_bid) {
   $ret_val = array();
 
   if (is_numeric($ss_bid)) {
@@ -444,7 +444,7 @@ function _ss_contextual_blocks_return_block_from_block_id($ss_bid) {
  * @return array
  *   Associative array of reactions for the passed block.
  */
-function _ss_contextual_blocks_return_reactions_from_block_id($ss_bid) {
+function _sharpspring_contextual_blocks_return_reactions_from_block_id($ss_bid) {
   $ret_val = array();
 
   if (is_numeric($ss_bid)) {
@@ -466,7 +466,7 @@ function _ss_contextual_blocks_return_reactions_from_block_id($ss_bid) {
  * @param int $weight
  *   Integer Value of new rule weight.
  */
-function _ss_contextual_blocks_update_rule_weight($data_id, $weight) {
+function _sharpspring_contextual_blocks_update_rule_weight($data_id, $weight) {
   db_update('sharpspring_contextual_block_rules')
     ->fields(array(
       'weight' => $weight,
@@ -485,7 +485,7 @@ function _ss_contextual_blocks_update_rule_weight($data_id, $weight) {
  * @return bool
  *   Returns true if the machine name is already in use.
  */
-function _ss_contextual_block_rule_name_exists($machine_name) {
+function _sharpspring_contextual_block_rule_name_exists($machine_name) {
   $exists = db_select('sharpspring_contextual_block_rules', 'sbr')
     ->fields('sbr')
     ->condition('machine_name', $machine_name)
@@ -501,7 +501,7 @@ function _ss_contextual_block_rule_name_exists($machine_name) {
  * @return array
  *   Associative array of drupal blocks.
  */
-function _ss_contextual_block_get_all_blocks() {
+function _sharpspring_contextual_block_get_all_blocks() {
   $ret_blocks = array();
 
   global $theme;
@@ -515,7 +515,7 @@ function _ss_contextual_block_get_all_blocks() {
   foreach ($blocks as $block) {
     if (!empty($block->bid) && isset($block->module)) {
       switch ($block->module) {
-        case 'ss_contextual_blocks':
+        case 'sharpspring_contextual_blocks':
           // Do not add any of our own blocks.
           break;
 
