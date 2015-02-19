@@ -53,7 +53,7 @@ function sharpspring_webforms_form_alter(&$form, &$form_state, $form_id) {
           'scope' => 'footer',
           'preprocessed' => FALSE,
           'type' => 'external',
-          'weight' => 3
+          'weight' => 3,
         ));
 
         $has_added_form_js = TRUE;
@@ -113,7 +113,7 @@ function sharpspring_webforms_config_form($form, &$form_state) {
   foreach ($ss_query as $row) {
     $webform_codes[$row->nid] = $row;
   }
-  
+
   $forms_count = 0;
   foreach ($wf_query as $row) {
     $forms_count++;
@@ -233,7 +233,7 @@ function sharpspring_webforms_config_form_submit(&$form, &$form_state) {
     $base_uri = $form['tracking']['webforms'][$wid]['base_uri_' . $wid]['#value'];
     $endpoint = $form['tracking']['webforms'][$wid]['endpoint_' . $wid]['#value'];
 
-    //Check for existing webform settings.
+    // Check for existing webform settings.
     $result_check = db_select('sharpspring_webforms', 'nid')
       ->fields('nid')
       ->condition('nid', $wid, '=')
