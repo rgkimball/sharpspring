@@ -367,7 +367,7 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
       ->condition('rule_id', $form_state['values']['rule_id'])
       ->execute();
 
-    drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted'), array('@rule_name' => $rule_name));
+    drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted', array('@rule_name' => $rule_name)));
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 }
@@ -453,7 +453,7 @@ function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_st
       ->condition('ss_bid', $form_state['values']['ss_bid'])
       ->execute();
 
-    drupal_set_message(t('SharpSpring block @block_name deleted'), array('@block_name' => $block_name));
+    drupal_set_message(t('SharpSpring block @block_name deleted', array('@block_name' => $block_name)));
     drupal_goto('admin/config/system/sharpspring/blocks');
   }
 }
@@ -573,7 +573,7 @@ function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state
 
   if (!empty($name) && !empty($description)) {
     $new_bid = _sharpspring_contextual_blocks_insert_block($name, $description, $reactions);
-    drupal_set_message(t('SharpSpring block @name saved.'), array('@name' => $name));
+    drupal_set_message(t('SharpSpring block @name saved.', array('@name' => $name)));
     $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/edit_block/' . $new_bid;
   }
 }
