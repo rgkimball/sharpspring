@@ -239,30 +239,34 @@ function sharpspring_webforms_config_form_submit(&$form, &$form_state) {
     $base_uri = $form['tracking']['webforms'][$wid]['base_uri_' . $wid]['#value'];
     $endpoint = $form['tracking']['webforms'][$wid]['endpoint_' . $wid]['#value'];
 
+    //Check for existing webform settings.
     $result_check = db_select('sharpspring_webforms', 'nid')
       ->fields('nid')
       ->condition('nid', $wid, '=')
       ->execute();
 
-    // If there's any results, delete them.
+    $existing = FALSE;
     foreach ($result_check as $result) {
       if (!empty($result)) {
-        db_delete('sharpspring_webforms')
-          ->condition('nid', $wid, '=')
-          ->execute();
+        $existing = TRUE;
       }
     }
 
     // Now save new info.
     $db_name = 'sharpspring_webforms';
     $data = array(
-      'nid' => check_plain($wid),
+      'nid' => $wid,
       'base_uri' => check_plain($base_uri),
       'endpoint' => check_plain($endpoint),
-      'status' => check_plain($status),
+      'status' => $status,
     );
 
-    drupal_write_record($db_name, $data);
-    
+    if ($existing) {
+      drupal_write_record($db_name, $data, 'nid');
+    }
+    else {
+      drupal_write_record($db_name, $data);
+    }
+
   }
 }
