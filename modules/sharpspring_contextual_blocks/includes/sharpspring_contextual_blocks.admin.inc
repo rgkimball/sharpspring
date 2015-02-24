@@ -48,7 +48,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
           'data' => array(
             '#theme' => 'link',
             '#text' => t('edit'),
-            '#path' => 'admin/config/system/sharpspring/blocks/edit_block/' . $bid,
+            '#path' => 'admin/config/system/sharpspring/blocks/add_block/' . $bid,
             '#options' => array('attributes' => array(), 'html' => FALSE),
           ),
         ),
