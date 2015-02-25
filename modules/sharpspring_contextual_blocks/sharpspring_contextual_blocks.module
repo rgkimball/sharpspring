@@ -50,7 +50,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_add_rule_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
+    'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -70,7 +70,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_edit_rule_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
+    'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -80,7 +80,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_add_block_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
+    'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -90,7 +90,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_delete_block_form', 6),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
+    'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -102,7 +102,7 @@ function sharpspring_contextual_blocks_menu() {
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
-    'weight' => 11
+    'weight' => 11,
   );
 
   return $items;

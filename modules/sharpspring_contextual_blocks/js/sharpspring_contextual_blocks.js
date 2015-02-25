@@ -12,7 +12,6 @@
 function ssContextualBlock(resp) {
   (function ($, Drupal, window, document) {
       var segmentVal = resp;
-console.log("!");
       // Loop through each contextual block.
       $('.ss-contextual-wrapper').each(function() {
         var this_bid = $(this).attr('ssbid');
@@ -24,6 +23,7 @@ console.log("!");
           data: segmentVal,
           ss_wrapper: this,
           success: function(data, text_status) {
+            console.log(data);
             $(this.ss_wrapper).html(data);
           }
         });

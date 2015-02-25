@@ -38,6 +38,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
     $description = (!empty($block->description)) ? $block->description : '';
 
     // Build the table rows.
+    $delta = 'sharpspring_contextual_block_' . $bid;
     $rows[$bid] = array(
       'data' => array(
         // Block name column.
@@ -48,7 +49,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
           'data' => array(
             '#theme' => 'link',
             '#text' => t('edit'),
-            '#path' => 'admin/config/system/sharpspring/blocks/add_block/' . $bid,
+            '#path' => 'admin/structure/block/manage/sharpspring_contextual_blocks/' . $delta . '/configure',
             '#options' => array('attributes' => array(), 'html' => FALSE),
           ),
         ),

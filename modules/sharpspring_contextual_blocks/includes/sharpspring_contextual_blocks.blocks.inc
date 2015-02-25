@@ -60,3 +60,12 @@ function _sharpspring_contextual_blocks_return_block_contents($bid) {
 
   return '<div id="ss-contextual-block-' . $bid . '" class="ss-contextual-wrapper" ssbid="' . $bid . '"></div>';
 }
+
+/**
+ * Implements hook_block_configure().
+ */
+function sharpspring_contextual_blocks_block_configure($delta = '') {
+
+  $foo = module_load_include('inc', 'sharpspring_contextual_blocks', 'sharpspring_contextual_blocks.crud_forms');
+  return sharpspring_contextual_blocks_configure_form(array(), $form_state, $delta);
+}

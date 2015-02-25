@@ -120,42 +120,26 @@ function _sharpspring_contextual_set_block_form(&$form, &$form_state, $ss_bid) {
   // to modify this form, so add a base form ID.
   $form_state['build_info']['base_form_id'] = 'block_add_block_form';
 
-  $this_block = _sharpspring_contextual_blocks_return_block_from_block_id($ss_bid);
-  $reactions = _sharpspring_contextual_blocks_return_reactions_from_block_id($ss_bid);
-
-  $form['settings']['title']['#default_value'] = (!empty($this_block['name'])) ? $this_block['name'] : '';
-  $form['settings']['block_description']['#default_value'] = (!empty($this_block['description'])) ? $this_block['description'] : '';
-
-  foreach ($reactions as $react_id => $saved_reaction) {
-    if (isset($form['settings']['reactions'][$react_id]) && isset($saved_reaction->bid)) {
-      $form['settings']['reactions'][$react_id]['react_rule']['#default_value'] = $saved_reaction->bid;
-    }
-  }
-
-  $form['ss_bid'] = array(
-    '#type' => 'hidden',
-    '#value' => $ss_bid,
-  );
-
-
-  // Prevent block_add_block_form_validate/submit() from being automatically
-  // added because of the base form ID by providing these handlers manually.
-  $form['#validate'] = array();
-  $form['#submit'] = array('sharpspring_contextual_blocks_add_block_form_submit');
+  $form['#submit'][] = 'sharpspring_contextual_blocks_add_block_form_submit';
 
 }
 
 /**
- * Implements hook_block_configure().
+ * Builds the sharpspring block configuration form.
+ *
+ * @param array $form
+ *   An array of form elements.
+ * @param array $form_state
+ *   An array describing the state of the form.
+ * @param int $delta
+ *   The block delta of the block affected by the form.
+ *
+ * @return array
+ *   The fully built form array.
  */
-function sharpspring_contextual_blocks_block_configure($delta = '') {
+function sharpspring_contextual_blocks_configure_form($form, &$form_state, $delta) {
 
-  return sharpspring_contextual_blocks_configure_form(array(), $form_state);
-}
-
-function sharpspring_contextual_blocks_configure_form($form, &$form_state) {
-
-  $form['#tree'] = TRUE;
+  $ss_bid = substr($delta, 29);
 
   $form['block_description'] = array(
     '#type' => 'textarea',
@@ -168,6 +152,7 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state) {
   $form['reactions'] = array(
     '#type' => 'fieldset',
     '#title' => t('Reactions'),
+    '#tree' => TRUE,
   );
 
   $form['reactions']['table_begin'] = array(
@@ -206,11 +191,22 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state) {
   $form['reactions']['table_end'] = array(
     '#markup' => '</table>',
   );
-//
-//  $form['submit'] = array(
-//    '#type' => 'submit',
-//    '#value' => t('Save'),
-//  );
+
+  $this_block = _sharpspring_contextual_blocks_return_block_from_block_id($ss_bid);
+  $reactions = _sharpspring_contextual_blocks_return_reactions_from_block_id($ss_bid);
+
+  $form['block_description']['#default_value'] = (!empty($this_block['description'])) ? $this_block['description'] : '';
+
+  foreach ($reactions as $react_id => $saved_reaction) {
+    if (isset($form['reactions'][$react_id]) && isset($saved_reaction->bid)) {
+      $form['reactions'][$react_id]['react_rule']['#default_value'] = $saved_reaction->bid;
+    }
+  }
+
+  $form['ss_bid'] = array(
+    '#type' => 'hidden',
+    '#value' => $ss_bid,
+  );
 
   return $form;
 
@@ -482,6 +478,8 @@ function sharpspring_contextual_blocks_delete_block_form($form, &$form_state, $s
 function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['ss_bid']) && is_numeric($form_state['values']['ss_bid'])) {
     $block_name = (!empty($form_state['values']['block_name'])) ? $form_state['values']['block_name'] : '';
+    $ss_bid = $form_state['values']['ss_bid'];
+    $delta = 'sharpspring_contextual_block_' . $ss_bid;
 
     db_delete('sharpspring_contextual_blocks')
       ->condition('ss_bid', $form_state['values']['ss_bid'])
@@ -490,6 +488,16 @@ function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_st
     // Also delete all rules associated with this block.
     db_delete('sharpspring_contextual_block_reactions')
       ->condition('ss_bid', $form_state['values']['ss_bid'])
+      ->execute();
+
+    // Delete the blocks themselves.
+    db_delete('block')
+      ->condition('module', 'sharpspring_contextual_blocks')
+      ->condition('delta', $delta)
+      ->execute();
+    db_delete('block_role')
+      ->condition('module', 'sharpspring_contextual_blocks')
+      ->condition('delta', $delta)
       ->execute();
 
     drupal_set_message(t('SharpSpring block @block_name deleted', array('@block_name' => $block_name)));
@@ -595,6 +603,9 @@ function sharpspring_contextual_blocks_edit_rule_form_submit($form, &$form_state
 function sharpspring_contextual_blocks_add_block_form($form, &$form_state, $ss_bid = NULL) {
   _sharpspring_contextual_set_block_form($form, $form_state, $ss_bid);
 
+  // Prevent block_add_block_form_validate/submit() from being automatically
+  // added because of the base form ID by providing these handlers manually.
+  $form['#validate'] = array();
   return $form;
 }
 
@@ -608,10 +619,10 @@ function sharpspring_contextual_blocks_add_block_form($form, &$form_state, $ss_b
  */
 function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state) {
   $new_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
-  $name = (!empty($new_vals['settings']['title'])) ? $new_vals['settings']['title'] : '';
+  $name = (!empty($new_vals['title'])) ? $new_vals['title'] : '';
   $ss_bid = (!empty($new_vals['ss_bid'])) ? $new_vals['ss_bid'] : 0;
-  $description = (!empty($new_vals['settings']['block_description'])) ? $new_vals['settings']['block_description'] : '';
-  $reactions = (!empty($new_vals['settings']['reactions'])) ? $new_vals['settings']['reactions'] : array();
+  $description = (!empty($new_vals['block_description'])) ? $new_vals['block_description'] : '';
+  $reactions = (!empty($new_vals['reactions'])) ? $new_vals['reactions'] : array();
 
   if (!empty($ss_bid) && !empty($name) && !empty($description)) {
     _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);
@@ -619,8 +630,70 @@ function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state
   }
 
   elseif (!empty($name) && !empty($description)) {
-    $new_bid = _sharpspring_contextual_blocks_insert_block($name, $description, $reactions);
+    $ss_bid = _sharpspring_contextual_blocks_insert_block($name, $description, $reactions);
     drupal_set_message(t('SharpSpring block @name saved.', array('@name' => $name)));
-    $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/add_block/' . $new_bid;
+    $form_state['redirect'] = 'admin/config/system/sharpspring/blocks/add_block/' . $ss_bid;
+
+    $delta = 'sharpspring_contextual_block_' . $ss_bid;
+    // Run the normal new block submission.
+    // This is borrowed from block_add_block_form_submit).
+    $query = db_insert('block')->fields(array(
+      'visibility',
+      'pages',
+      'custom',
+      'title',
+      'module',
+      'theme',
+      'region',
+      'status',
+      'weight',
+      'delta',
+      'cache',
+    ));
+    foreach (list_themes() as $key => $theme) {
+      if ($theme->status) {
+        $region = !empty($form_state['values']['regions'][$theme->name]) ? $form_state['values']['regions'][$theme->name] : BLOCK_REGION_NONE;
+        $query->values(array(
+          'visibility' => (int) $form_state['values']['visibility'],
+          'pages' => trim($form_state['values']['pages']),
+          'custom' => (int) $form_state['values']['custom'],
+          'title' => $form_state['values']['title'],
+          'module' => $form_state['values']['module'],
+          'theme' => $theme->name,
+          'region' => ($region == BLOCK_REGION_NONE ? '' : $region),
+          'status' => 0,
+          'status' => (int) ($region != BLOCK_REGION_NONE),
+          'weight' => 0,
+          'delta' => $delta,
+          'cache' => DRUPAL_NO_CACHE,
+        ));
+      }
+    }
+    $query->execute();
+
+    $query = db_insert('block_role')->fields(array('rid', 'module', 'delta'));
+    foreach (array_filter($form_state['values']['roles']) as $rid) {
+      $query->values(array(
+        'rid' => $rid,
+        'module' => $form_state['values']['module'],
+        'delta' => $delta,
+      ));
+    }
+    $query->execute();
+
+    drupal_set_message(t('The block has been created.'));
+    cache_clear_all();
   }
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function sharpspring_contextual_blocks_block_save($delta = '', $edit = array()) {
+  $ss_bid = (!empty($edit['ss_bid'])) ? $edit['ss_bid'] : NULL;
+  $name = (!empty($edit['title'])) ? $edit['title'] : '';
+  $description = (!empty($edit['block_description'])) ? $edit['block_description'] : '';
+  $reactions = (!empty($edit['reactions'])) ? $edit['reactions'] : array();
+
+  return _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, $reactions);;
 }
