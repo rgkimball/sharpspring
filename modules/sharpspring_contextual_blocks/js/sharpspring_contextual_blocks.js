@@ -23,7 +23,6 @@ function ssContextualBlock(resp) {
           data: segmentVal,
           ss_wrapper: this,
           success: function(data, text_status) {
-            console.log(data);
             $(this.ss_wrapper).html(data);
           }
         });

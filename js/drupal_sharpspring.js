@@ -18,7 +18,6 @@ function ssDrupalCallback(resp) {
     } else if (resp.lead) {
       sendData = resp.lead;
     }
-    console.log(resp);
     Drupal.settings.sharpspring.response = sendData;
     Drupal.attachBehaviors();
   }
