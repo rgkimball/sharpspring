@@ -58,7 +58,10 @@ function sharpspring_contextual_blocks_menu() {
     'title' => 'Delete SharpSpring contextual rule',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_contextual_blocks_delete_rule_form', 6),
+    'page arguments' => array(
+      'sharpspring_contextual_blocks_delete_rule_form',
+      6,
+    ),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -68,7 +71,10 @@ function sharpspring_contextual_blocks_menu() {
     'title' => 'Edit SharpSpring contextual rule',
     'description' => 'Provides a form to edit a SharpSpring contextual rule',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_contextual_blocks_edit_rule_form', 6),
+    'page arguments' => array(
+      'sharpspring_contextual_blocks_edit_rule_form',
+      6,
+    ),
     'access arguments' => array('administer sharpspring'),
     'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -78,7 +84,10 @@ function sharpspring_contextual_blocks_menu() {
     'title' => 'Add new SharpSpring contextual block',
     'description' => 'Provides a form to add a new SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_contextual_blocks_add_block_form', 6),
+    'page arguments' => array(
+      'sharpspring_contextual_blocks_add_block_form',
+      6,
+    ),
     'access arguments' => array('administer sharpspring'),
     'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -88,7 +97,10 @@ function sharpspring_contextual_blocks_menu() {
     'title' => 'Delete SharpSpring contextual block',
     'description' => 'Provides a form to confirm deletion of a SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_contextual_blocks_delete_block_form', 6),
+    'page arguments' => array(
+      'sharpspring_contextual_blocks_delete_block_form',
+      6,
+    ),
     'access arguments' => array('administer sharpspring'),
     'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
@@ -98,7 +110,10 @@ function sharpspring_contextual_blocks_menu() {
     'title' => 'Block Rules',
     'description' => 'Provides a form to edit a SharpSpring contextual block',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('sharpspring_contextual_blocks_rules_config_form', 6),
+    'page arguments' => array(
+      'sharpspring_contextual_blocks_rules_config_form',
+      6,
+    ),
     'access arguments' => array('administer sharpspring'),
     'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
@@ -125,92 +140,89 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
 
   // Load all of our rules and check which one passes.
   // This is the rule_id we will use.
-  if (!empty($rules)) {
-    $rule_id = 0;
+  $rule_id = 0;
 
-    foreach ($rules as $segment_rule) {
-      if (!empty($segment_rule->segment_rule)) {
-        $this_rule = json_decode($segment_rule->segment_rule);
-        $and_or = (!empty($this_rule->and_or)) ? $this_rule->and_or : 'and';
-        $processed_rules = (!empty($this_rule->rules)) ? $this_rule->rules : array();
+  foreach ($rules as $segment_rule) {
+    if (!empty($segment_rule->segment_rule)) {
+      $this_rule = json_decode($segment_rule->segment_rule);
+      $and_or = (!empty($this_rule->and_or)) ? $this_rule->and_or : 'and';
+      $processed_rules = (!empty($this_rule->rules)) ? $this_rule->rules : array();
 
-        // OR starts with the test as false.
-        // Then passes when one rule has passed.
-        // AND starts as true and fails when one fails.
-        $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
-        foreach ($processed_rules as $rule_part) {
-          if (isset($rule_part->fieldname) && isset($rule_part->value)) {
-            if ($and_or == 'or') {
-              // Any passed rule will make this true.
-              if (isset($_POST[$rule_part->fieldname]) && $_POST[$rule_part->fieldname] == $rule_part->value) {
-                $passed_rule = TRUE;
-              }
+      // OR starts with the test as false.
+      // Then passes when one rule has passed.
+      // AND starts as true and fails when one fails.
+      $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
+      foreach ($processed_rules as $rule_part) {
+        if (isset($rule_part->fieldname) && isset($rule_part->value)) {
+          if ($and_or == 'or') {
+            // Any passed rule will make this true.
+            if (isset($_POST[$rule_part->fieldname]) && $_POST[$rule_part->fieldname] == $rule_part->value) {
+              $passed_rule = TRUE;
             }
-            else {
-              if (!isset($_POST[$rule_part->fieldname]) || $_POST[$rule_part->fieldname] != $rule_part->value) {
-                // This rule failed, so we set $passed_rule to FALSE;
-                $passed_rule = FALSE;
-              }
+          }
+          else {
+            if (!isset($_POST[$rule_part->fieldname]) || $_POST[$rule_part->fieldname] != $rule_part->value) {
+              // This rule failed, so we set $passed_rule to FALSE;
+              $passed_rule = FALSE;
             }
           }
         }
-
-        if ($passed_rule) {
-          $rule_id = (!empty($segment_rule->rule_id)) ? $segment_rule->rule_id : 0;
-        }
-
       }
+
+      if ($passed_rule) {
+        $rule_id = (!empty($segment_rule->rule_id)) ? $segment_rule->rule_id : 0;
+      }
+
+    }
+  }
+
+  $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+    ->fields('sbr')
+    ->condition('rule_id', $rule_id)
+    ->condition('ss_bid', $ss_bid)
+    ->execute()
+    ->fetchAssoc();
+
+  if (isset($drupal_block['bid']) && $drupal_block['bid'] == -1) {
+    // The user has selected 'none' as the content here.
+  }
+  else {
+    if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
+      // The user has selected 'default' as the content.
+      // Load the default rule for this SS block.
+      $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
+        ->fields('sbr')
+        ->condition('rule_id', 0)
+        ->condition('ss_bid', $ss_bid)
+        ->execute()
+        ->fetchAssoc();
+
     }
 
-    $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
-      ->fields('sbr')
-      ->condition('rule_id', $rule_id)
-      ->condition('ss_bid', $ss_bid)
-      ->execute()
-      ->fetchAssoc();
+    if (!empty($drupal_block['bid']) && $drupal_block['bid'] != -1) {
+      // One last check for empty content.
+      $block_info = db_select('block', 'b')
+        ->fields('b', array('module', 'delta', 'title'))
+        ->condition('bid', $drupal_block['bid'])
+        ->execute()
+        ->fetchAssoc();
 
-    if (isset($drupal_block['bid']) && $drupal_block['bid'] == -1) {
-      // The user has selected 'none' as the content here.
-    }
-    else {
-      if (isset($drupal_block['bid']) && $drupal_block['bid'] == 0) {
-        // The user has selected 'default' as the content.
-        // Load the default rule for this SS block.
-        $drupal_block = db_select('sharpspring_contextual_block_reactions', 'sbr')
-          ->fields('sbr')
-          ->condition('rule_id', 0)
-          ->condition('ss_bid', $ss_bid)
-          ->execute()
-          ->fetchAssoc();
+      if (!empty($block_info['module']) && !empty($block_info['delta'])) {
+        switch ($block_info['module']) {
+          case 'block':
+            $block = block_load('block', $block_info['delta']);
+            $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
+            $ret_val = drupal_render($render_array);
+            break;
 
-      }
-
-      if (!empty($drupal_block['bid']) && $drupal_block['bid'] != -1) {
-        // One last check for empty content.
-        $block_info = db_select('block', 'b')
-          ->fields('b', array('module', 'delta', 'title'))
-          ->condition('bid', $drupal_block['bid'])
-          ->execute()
-          ->fetchAssoc();
-
-        if (!empty($block_info['module']) && !empty($block_info['delta'])) {
-          switch ($block_info['module']) {
-            case 'block':
-              $block = block_load('block', $block_info['delta']);
-              $render_array = _block_get_renderable_array(_block_render_blocks(array($block)));
-              $ret_val = drupal_render($render_array);
-              break;
-
-            default:
-              $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
-              if (!empty($block['content'])) {
-                $ret_val = render($block['content']);
-              }
-              break;
-          }
+          default:
+            $block = module_invoke($block_info['module'], 'block_view', $block_info['delta']);
+            if (!empty($block['content'])) {
+              $ret_val = render($block['content']);
+            }
+            break;
         }
       }
-
     }
 
   }
