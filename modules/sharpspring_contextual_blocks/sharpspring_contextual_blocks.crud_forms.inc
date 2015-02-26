@@ -350,7 +350,7 @@ function sharpspring_contextual_blocks_delete_rule_form($form, &$form_state, $ru
   if (!empty($exists)) {
     $rule_name = (!empty($exists[0])) ? $exists[0] : '';
 
-    drupal_set_title('Are you sure you want to delete the rule ' . $rule_name . '?');
+    drupal_set_title(t('Are you sure you want to delete the rule @rule_name?', array('@rule_name' => $rule_name)));
 
     $form['rule_id'] = array(
       '#type' => 'hidden',
@@ -430,7 +430,7 @@ function sharpspring_contextual_blocks_delete_block_form($form, &$form_state, $s
   if (!empty($exists)) {
     $block_name = (!empty($exists['name'])) ? $exists['name'] : '';
 
-    drupal_set_title('Are you sure you want to delete the SharpSpring block ' . $block_name . '?');
+    drupal_set_title(t('Are you sure you want to delete the Sharpspring block @block_name?', array('@block_name' => $block_name)));
 
     $form['ss_bid'] = array(
       '#type' => 'hidden',
