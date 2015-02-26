@@ -27,7 +27,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
     '#type' => 'actions',
   );
   $form['block_table']['actions']['new_block'] = array(
-    '#markup' => l(t('Add Block'), 'admin/config/system/sharpspring/blocks/add_block'),
+    '#markup' => l(t('Add Block'), 'admin/config/system/sharpspring/blocks/add_block',array('query' => array('destination' => 'admin/config/system/sharpspring/blocks')))
   );
 
   $rows = array();
@@ -50,7 +50,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
             '#theme' => 'link',
             '#text' => t('edit'),
             '#path' => 'admin/structure/block/manage/sharpspring_contextual_blocks/' . $delta . '/configure',
-            '#options' => array('attributes' => array(), 'html' => FALSE),
+            '#options' => array('attributes' => array(), 'html' => FALSE, 'query' => array('destination' => 'admin/config/system/sharpspring/blocks')),
           ),
         ),
         array(
