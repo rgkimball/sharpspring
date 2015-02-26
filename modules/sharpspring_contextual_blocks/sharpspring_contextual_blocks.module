@@ -7,7 +7,7 @@
  * to SharpSpring lead or contact fields.
  */
 
-module_load_include('inc', 'sharpspring_contextual_blocks', 'includes/sharpspring_contextual_blocks.blocks');
+module_load_include('inc', 'sharpspring_contextual_blocks', 'sharpspring_contextual_blocks.blocks');
 
 /**
  * Implements hook_menu().
@@ -19,7 +19,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_config_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
+    'file' => 'sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
@@ -30,7 +30,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_config_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
+    'file' => 'sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 10,
   );
@@ -63,7 +63,7 @@ function sharpspring_contextual_blocks_menu() {
       6,
     ),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.crud_forms.inc',
+    'file' => 'sharpspring_contextual_blocks.crud_forms.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
@@ -115,7 +115,7 @@ function sharpspring_contextual_blocks_menu() {
       6,
     ),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
+    'file' => 'sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 11,
   );
