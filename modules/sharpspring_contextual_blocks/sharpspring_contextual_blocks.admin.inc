@@ -149,7 +149,7 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
               '#theme' => 'link',
               '#text' => t('edit'),
               '#path' => 'admin/config/system/sharpspring/blocks/edit_rule/' . $rule['rule_id'],
-              '#options' => array('attributes' => array(), 'html' => FALSE),
+              '#options' => array('attributes' => array(), 'html' => FALSE, 'query' => array('destination' => $_SERVER['REDIRECT_URL'])),
             ),
           ),
           array(
