@@ -192,6 +192,10 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state, $delt
     '#markup' => '</table>',
   );
 
+  $form['reactions']['show_rules'] = array(
+    '#markup' => l('Sharpspring Rules', 'admin/config/system/sharpspring/blocks/rules', array('query' => array('destination' => $_SERVER['REDIRECT_URL'])))
+  );
+
   $this_block = _sharpspring_contextual_blocks_return_block_from_block_id($ss_bid);
   $reactions = _sharpspring_contextual_blocks_return_reactions_from_block_id($ss_bid);
 
