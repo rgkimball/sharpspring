@@ -105,7 +105,7 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
     '#type' => 'actions',
   );
   $form['rules_table']['actions']['new_rule'] = array(
-    '#markup' => l(t('Add Rule'), 'admin/config/system/sharpspring/blocks/add_rule'),
+    '#markup' => l(t('Add Rule'), 'admin/config/system/sharpspring/blocks/add_rule', array('query' => array('destination' => 'admin/config/system/sharpspring/blocks/rules'))),
   );
 
   // Load the custom rules.

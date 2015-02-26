@@ -403,7 +403,7 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
       ->execute();
 
     drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted', array('@rule_name' => $rule_name)));
-    drupal_goto('admin/config/system/sharpspring/blocks');
+    drupal_goto('admin/config/system/sharpspring/blocks/rules');
   }
 }
 
