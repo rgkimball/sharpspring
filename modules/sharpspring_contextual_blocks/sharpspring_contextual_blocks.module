@@ -19,7 +19,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_config_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'sharpspring_contextual_blocks.admin.inc',
+    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
@@ -153,17 +153,28 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
       // AND starts as true and fails when one fails.
       $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
       foreach ($processed_rules as $rule_part) {
+        $negative_rule = ($rule_part->polarity == 'not_equals') ? TRUE: FALSE;
         if (isset($rule_part->fieldname) && isset($rule_part->value)) {
           if ($and_or == 'or') {
             // Any passed rule will make this true.
             if (isset($_POST[$rule_part->fieldname]) && $_POST[$rule_part->fieldname] == $rule_part->value) {
-              $passed_rule = TRUE;
+              if (!$negative_rule) {
+                $passed_rule = TRUE;
+              }
+              else {
+                $passed_rule = FALSE;
+              }
             }
           }
           else {
             if (!isset($_POST[$rule_part->fieldname]) || $_POST[$rule_part->fieldname] != $rule_part->value) {
               // This rule failed, so we set $passed_rule to FALSE;
-              $passed_rule = FALSE;
+              if (!$negative_rule) {
+                $passed_rule = FALSE;
+              }
+              else {
+                $passed_rule = TRUE;
+              }
             }
           }
         }

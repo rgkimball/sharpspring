@@ -62,6 +62,18 @@ function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
       '#suffix' => '</td>',
     );
 
+    $form['rules_fieldset'][$n]['polarity'] = array(
+      '#type' => 'select',
+      '#title' => t('Polarity'),
+      '#description' => t('Whether the field equals this value or not.'),
+      '#prefix' => '<td>',
+      '#suffix' => '</td>',
+      '#options' => array(
+        'equals' => t('Equals'),
+        'not_equals' => t('Does not equal'),
+      ),
+    );
+
     $form['rules_fieldset'][$n]['value'] = array(
       '#type' => 'textfield',
       '#title' => t('Value'),
@@ -545,6 +557,7 @@ function sharpspring_contextual_blocks_edit_rule_form($form, &$form_state, $rule
 
     foreach ($rules as $rule_num => $rule_content) {
       $form['rules_fieldset'][$rule_num]['fieldname']['#default_value'] = (!empty($rule_content['fieldname'])) ? $rule_content['fieldname'] : '';
+      $form['rules_fieldset'][$rule_num]['polarity']['#default_value'] = (!empty($rule_content['polarity'])) ? $rule_content['polarity'] : '';
       $form['rules_fieldset'][$rule_num]['value']['#default_value'] = (!empty($rule_content['value'])) ? $rule_content['value'] : '';
     }
 
