@@ -113,15 +113,23 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
 
   $rows = array();
   $row_elements = array();
+  global $user;
+  $uid = $user->uid;
+  $spoofs = variable_get('sharpspring_spoofs');
+  $user_spoofs = $spoofs[$uid];
 
   // Format custom rule table rows.
   foreach ($contents as $rule) {
+    $spoof_default = FALSE;
     $name = (!empty($rule['name'])) ? $rule['name'] : '';
     $description = (!empty($rule['description'])) ? $rule['description'] : '';
     $weight = (!empty($rule['weight'])) ? $rule['weight'] : 0;
 
     if (!empty($rule['rule_id'])) {
       $id = $rule['rule_id'];
+      if (in_array($id, $user_spoofs)) {
+        $spoof_default = TRUE;
+      }
       // Build the table rows.
       $rows[$id] = array(
         'data' => array(
@@ -160,12 +168,24 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
               '#options' => array('attributes' => array(), 'html' => FALSE),
             ),
           ),
+          array(
+            'data' => array(
+              '#type' => 'checkbox',
+              '#title' => t('Spoof This Rule'),
+              '#parents' => array('data_table', $id, 'spoof'),
+              '#attributes' => array(
+                'class' => array('rule-spoof'),
+              ),
+              '#default_value' => $spoof_default,
+            ),
+          ),
         ),
         'class' => array('draggable'),
       );
       // Build rows of the form elements in the table.
       $row_elements[$id] = array(
         'weight' => &$rows[$id]['data'][1]['data'],
+        'spoof' => &$rows[$id]['data'][6]['data'],
       );
     }
 
@@ -182,7 +202,7 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
       array('data' => NULL, 'colspan' => 2),
       t('Rule Name'),
       t('Description'),
-      array('data' => t('Operations'), 'colspan' => 2),
+      array('data' => t('Operations'), 'colspan' => 3),
     ),
     '#rows' => $rows,
     '#empty' => t('There are no rules available.'),
@@ -192,7 +212,7 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
 
   $form['rules_table']['save_table'] = array(
     '#type' => 'submit',
-    '#value' => t('Save Rule Weights'),
+    '#value' => t('Save Rule Weights and Options'),
   );
 
   return $form;
@@ -206,15 +226,20 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
  * @param array $form_state
  *   An array of submitted values for the form.
  */
-function sharpspring_contextual_blocks_config_form_submit($form, &$form_state) {
+function sharpspring_contextual_blocks_rules_config_form_submit($form, &$form_state) {
   // First save the existing block information.
   $input_vals = (!empty($form_state['values'])) ? $form_state['values'] : array();
-
+  $spoofs = array();
   if (!empty($input_vals['data_table'])) {
     foreach ($input_vals['data_table'] as $data_id => $value) {
-      _sharpspring_contextual_blocks_update_rule_weight($data_id, $value);
+      _sharpspring_contextual_blocks_update_rule_weight($data_id, $value['weight']);
+      if ($value['spoof']) {
+        $spoofs[] = $data_id;
+      }
     }
   }
+  global $user;
+  variable_set('sharpspring_spoofs', array($user->uid => $spoofs));
 
   drupal_set_message(t('SharpSpring Contextual Blocks saved'));
 }

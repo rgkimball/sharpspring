@@ -142,8 +142,16 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
   // This is the rule_id we will use.
   $rule_id = 0;
 
+  global $user;
+  $spoofs = variable_get('sharpspring_spoofs', array());
+  $user_spoofs = $spoofs[$user->uid];
   foreach ($rules as $segment_rule) {
     if (!empty($segment_rule->segment_rule)) {
+      if (in_array($segment_rule->rule_id, $user_spoofs)) {
+        $passed_rule = TRUE;
+        $rule_id = (!empty($segment_rule->rule_id)) ? $segment_rule->rule_id : 0;
+        break;
+      }
       $this_rule = json_decode($segment_rule->segment_rule);
       $and_or = (!empty($this_rule->and_or)) ? $this_rule->and_or : 'and';
       $processed_rules = (!empty($this_rule->rules)) ? $this_rule->rules : array();
@@ -174,6 +182,11 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
               }
               else {
                 $passed_rule = TRUE;
+              }
+            }
+            else {
+              if ($negative_rule) {
+                $passed_rule = FALSE;
               }
             }
           }
