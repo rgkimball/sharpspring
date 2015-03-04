@@ -27,7 +27,12 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
     '#type' => 'actions',
   );
   $form['block_table']['actions']['new_block'] = array(
-    '#markup' => l(t('Add Block'), 'admin/config/system/sharpspring/blocks/add_block',array('query' => array('destination' => 'admin/config/system/sharpspring/blocks')))
+    '#markup' => l(t('Add Block'), 'admin/config/system/sharpspring/blocks/add_block', array(
+      'query' => array(
+        'destination' => 'admin/config/system/sharpspring/blocks',
+      ),
+      )
+    ),
   );
 
   $rows = array();
@@ -50,7 +55,13 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
             '#theme' => 'link',
             '#text' => t('edit'),
             '#path' => 'admin/structure/block/manage/sharpspring_contextual_blocks/' . $delta . '/configure',
-            '#options' => array('attributes' => array(), 'html' => FALSE, 'query' => array('destination' => 'admin/config/system/sharpspring/blocks')),
+            '#options' => array(
+              'attributes' => array(),
+              'html' => FALSE,
+              'query' => array(
+                'destination' => 'admin/config/system/sharpspring/blocks',
+              ),
+            ),
           ),
         ),
         array(
@@ -157,7 +168,13 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
               '#theme' => 'link',
               '#text' => t('edit'),
               '#path' => 'admin/config/system/sharpspring/blocks/edit_rule/' . $rule['rule_id'],
-              '#options' => array('attributes' => array(), 'html' => FALSE, 'query' => array('destination' => $_SERVER['REDIRECT_URL'])),
+              '#options' => array(
+                'attributes' => array(),
+                'html' => FALSE,
+                'query' => array(
+                  'destination' => $_SERVER['REDIRECT_URL'],
+                ),
+              ),
             ),
           ),
           array(
