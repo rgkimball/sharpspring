@@ -161,7 +161,7 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
       // AND starts as true and fails when one fails.
       $passed_rule = ($and_or == 'or') ? FALSE : TRUE;
       foreach ($processed_rules as $rule_part) {
-        $negative_rule = ($rule_part->polarity == 'not_equals') ? TRUE: FALSE;
+        $negative_rule = ($rule_part->polarity == 'not_equals') ? TRUE : FALSE;
         if (isset($rule_part->fieldname) && isset($rule_part->value)) {
           if ($and_or == 'or') {
             // Any passed rule will make this true.
