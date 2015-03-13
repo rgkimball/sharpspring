@@ -67,7 +67,7 @@ function sharpspring_webforms_form_alter(&$form, &$form_state, $form_id) {
           $formjs .= "__ss_noform.push(['baseURI', '" . $result->base_uri . "']);";
           $formjs .= "__ss_noform.push(['endpoint', '" . $result->endpoint . "']);";
           // Target the specific webform form by #id.
-          $formjs .= "__ss_noform.push(['form', 'webform-client-form-" . $result->nid . "']);";
+          $formjs .= "__ss_noform.push(['form'," . $form['#id'] . "']);";
           $formjs .= '</script>';
 
           $form['#suffix'] = $formjs;
