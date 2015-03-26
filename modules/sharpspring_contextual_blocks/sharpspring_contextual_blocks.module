@@ -264,17 +264,12 @@ function sharpspring_contextual_blocks_callback($ss_bid) {
  *   Returns array keyed by block id, values is an object of field values.
  */
 function _sharpspring_contextual_blocks_return_all_drupal_blocks() {
-  if (db_table_exists('sharpspring_contextual_blocks')) {
-    $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
-      ->fields('scb')
-      ->execute()
-      ->fetchAllAssoc('ss_bid');
-  }
-  else {
-    $ss_blocks = array();
-  }
+  $ss_blocks = db_select('sharpspring_contextual_blocks', 'scb')
+    ->fields('scb')
+    ->execute()
+    ->fetchAllAssoc('ss_bid');
 
-  return $ss_blocks;
+  return $ss_blocks || array();
 }
 
 /**

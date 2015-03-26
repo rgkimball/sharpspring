@@ -34,12 +34,13 @@ function ssDrupalCallback(resp) {
     if (sharpspring) {
       var _ss = window._ss || [];
       _ss.push(['_setDomain', 'https://' + sharpspring.domain + '/net']);
-      _ss.push(['_setAccount',sharpspring.id]);
+      _ss.push(['_setAccount', sharpspring.id]);
       _ss.push(['_setResponseCallback', ssDrupalCallback]);
       _ss.push(['_trackPageView']);
 
       var ss = document.createElement('script');
-      ss.type = 'text/javascript'; ss.async = true;
+      ss.type = 'text/javascript';
+      ss.async = true;
       ss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + sharpspring.domain + '/client/ss.js';
       var scr = document.getElementsByTagName('script')[0];
       scr.parentNode.insertBefore(ss, scr);
