@@ -42,11 +42,11 @@ function sharpspring_menu() {
 }
 
 /**
- * Implements hook_page_alter().
+ * Implements hook_page_build().
  *
  * Used to insert JavaScript to the appropriate scope/region of the page.
  */
-function sharpspring_page_alter(&$page) {
+function sharpspring_page_build(&$page) {
 
   $id = variable_get('sharpspring_account');
   $domain = variable_get('sharpspring_domain');
@@ -58,27 +58,19 @@ function sharpspring_page_alter(&$page) {
 
     // Add the sharpspring custom segmentation field value.
     $segment_field = variable_get('sharpspring_segment_field');
-    drupal_add_js(array('sharpspring' => array('segmentationField' => $segment_field)), 'setting');
 
     // Add javascript to handle Sharpspring callback.
     $path = drupal_get_path('module', 'sharpspring');
-    drupal_add_js($path . '/js/drupal_sharpspring.js');
+    $page['page_top']['#attached']['js'][] = array(
+      'data' => array('sharpspring' => array(
+        'domain' => $domain,
+        'id' => $id,
+        'segmentationField' => $segment_field,
+      )),
+      'type' => 'setting'
+    );
+    $page['page_top']['#attached']['js'][] = $path . '/js/drupal_sharpspring.js';
 
-    $pagejs = "var _ss = _ss || [];\n";
-    $pagejs .= "_ss.push(['_setDomain', 'https://" . $domain . "/net']);\n";
-    $pagejs .= "_ss.push(['_setAccount', '" . $id . "']);\n";
-    $pagejs .= "_ss.push(['_setResponseCallback', ssDrupalCallback]);\n";
-    $pagejs .= "_ss.push(['_trackPageView']);\n";
-    $pagejs .= "(function() {\n";
-    $pagejs .= "\tvar ss = document.createElement('script');\n";
-    $pagejs .= "\tss.type = 'text/javascript'; ss.async = true;\n";
-    $pagejs .= "\tss.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '" . $domain . "/client/ss.js';\n";
-    $pagejs .= "\tvar scr = document.getElementsByTagName('script')[0];\n";
-    $pagejs .= "\tscr.parentNode.insertBefore(ss, scr);\n";
-    $pagejs .= "})();\n";
-
-    // Add compiled tracking code.
-    drupal_add_js($pagejs, array('scope' => 'header', 'type' => 'inline'));
   }
 }
 
