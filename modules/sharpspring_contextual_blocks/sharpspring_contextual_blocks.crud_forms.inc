@@ -418,12 +418,32 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
   if (!empty($form_state['values']['rule_id']) && is_numeric($form_state['values']['rule_id'])) {
     $rule_name = (!empty($form_state['values']['rule_name'])) ? $form_state['values']['rule_name'] : '';
 
-    $deleted = db_delete('sharpspring_contextual_block_rules')
-      ->condition('rule_id', $form_state['values']['rule_id'])
-      ->execute();
+    try {
+      
+      db_delete('sharpspring_contextual_block_rules')
+        ->condition('rule_id', $form_state['values']['rule_id'])
+        ->execute();
 
-    drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted', array('@rule_name' => $rule_name)));
+      drupal_set_message(t('SharpSpring Contextual Rule @rule_name deleted',
+        array('@rule_name' => $rule_name)));
+    }
+    catch (Exception $e) {
+
+      $message = t('Failed removing block rule !id from database: @err',
+        array(
+          '!id' => $form_state['values']['rule_id'],
+          '@err' => $e
+        ));
+      watchdog('Sharpspring',$message,WATCHDOG_NOTICE);
+      form_set_error('rule_id',$message);
+
+    }
+
     drupal_goto('admin/config/system/sharpspring/blocks/rules');
+  }
+  else {
+    form_set_error('rule_id',t('Invalid value supplied for rule id: !id',
+      array('!id' => $form_state['values']['rule_id'])));
   }
 }
 
