@@ -163,18 +163,18 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state, $delt
   );
 
   $blocks = _sharpspring_contextual_block_get_all_blocks();
-  $blocks[-1] = '- None -';
+  $blocks[-1] = t('- None -');
   ksort($blocks);
 
   $form['reactions'][0]['react_rule'] = array(
     '#type' => 'select',
     '#options' => $blocks,
-    '#prefix' => '<tr class="even"><td>Default</td><td>',
+    '#prefix' => '<tr class="even"><td>' . t('Default') . '</td><td>',
     '#suffix' => '</td></tr>',
   );
 
   $current_rules = _sharpspring_contextual_blocks_return_all_sharpspring_rules();
-  $blocks[0] = '- Default -';
+  $blocks[0] = t('- Default -');
   ksort($blocks);
 
   $count = 1;
