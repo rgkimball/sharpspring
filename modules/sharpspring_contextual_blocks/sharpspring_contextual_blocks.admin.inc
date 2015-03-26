@@ -138,7 +138,8 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
 
     if (!empty($rule['rule_id'])) {
       $id = $rule['rule_id'];
-      if (in_array($id, $user_spoofs)) {
+      $spoof = (!empty($user_spoofs)) ? $user_spoofs : array();
+      if (in_array($id, $spoof)) {
         $spoof_default = TRUE;
       }
       // Build the table rows.
