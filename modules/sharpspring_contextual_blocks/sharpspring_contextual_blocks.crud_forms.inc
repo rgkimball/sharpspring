@@ -181,10 +181,12 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state, $delt
   foreach ($current_rules as $rule) {
     $class = ($count % 2 == 0) ? 'even' : 'odd';
     if (!empty($rule['rule_id']) && isset($rule['name'])) {
+      $name = check_plain($rule['name']);
+
       $form['reactions'][$rule['rule_id']]['react_rule'] = array(
         '#type' => 'select',
         '#options' => $blocks,
-        '#prefix' => '<tr class="' . $class . '"><td>' . $rule['name'] . '</td><td>',
+        '#prefix' => '<tr class="' . $class . '"><td>' . $name . '</td><td>',
         '#suffix' => '</td></tr>',
       );
       $count++;

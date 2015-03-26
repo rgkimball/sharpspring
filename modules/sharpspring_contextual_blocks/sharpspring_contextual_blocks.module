@@ -269,7 +269,11 @@ function _sharpspring_contextual_blocks_return_all_drupal_blocks() {
     ->execute()
     ->fetchAllAssoc('ss_bid');
 
-  return $ss_blocks || array();
+  if (empty($ss_blocks)) {
+    $ss_blocks = array();
+  }
+
+  return $ss_blocks;
 }
 
 /**
