@@ -71,7 +71,7 @@ function sharpspring_contextual_blocks_block_configure($delta = '') {
     return sharpspring_contextual_blocks_configure_form(array(), $form_state, $delta);
   }
   else {
-    watchdog('Sharpspring', t('Sharpspring module failed to retrieve CRUD forms include.'),WATCHDOG_NOTICE);
+    watchdog('Sharpspring', 'Failed to retrieve Sharpspring Contextual Blocks CRUD include.', WATCHDOG_NOTICE);
     return FALSE;
   }
 }

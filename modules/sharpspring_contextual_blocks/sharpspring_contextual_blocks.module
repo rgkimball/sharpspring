@@ -343,7 +343,7 @@ function _sharpspring_contextual_blocks_update_rule($rule_id, $rules, $name, $de
  * @param array $reactions
  *   Array of block reactions.
  */
-function _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, $reactions) {
+function _sharpspring_contextual_blocks_update_block($ss_bid, $name, $description, array $reactions) {
   if (is_numeric($ss_bid)) {
     db_update('sharpspring_contextual_blocks')
       ->fields(array(

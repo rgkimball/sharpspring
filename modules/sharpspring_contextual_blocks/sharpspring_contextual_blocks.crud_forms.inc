@@ -7,9 +7,9 @@
 /**
  * Common helper function to provide the add/edit rule form.
  *
- * @param array $form
+ * @param $form
  *   An array representing the form.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  */
 function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
@@ -120,8 +120,12 @@ function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
 /**
  * Common helper function to define the block add/edit form.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
+ * @param $form_state
+ *   An array describing the state of the form.
+ * @param $ss_bid
+ *   The block id.
  */
 function _sharpspring_contextual_set_block_form(&$form, &$form_state, $ss_bid) {
 
@@ -139,9 +143,9 @@ function _sharpspring_contextual_set_block_form(&$form, &$form_state, $ss_bid) {
 /**
  * Builds the sharpspring block configuration form.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array describing the state of the form.
  * @param int $delta
  *   The block delta of the block affected by the form.
@@ -235,9 +239,9 @@ function sharpspring_contextual_blocks_configure_form($form, &$form_state, $delt
 /**
  * Returns a form to add a new SharpSpring contextual rule.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  *
  * @return array
@@ -252,9 +256,9 @@ function sharpspring_contextual_blocks_add_rule_form($form, &$form_state) {
 /**
  * Submit handler for the add rule form.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the submitted form state.
  */
 function sharpspring_contextual_blocks_add_rule_form_submit($form, &$form_state) {
@@ -279,9 +283,9 @@ function sharpspring_contextual_blocks_add_rule_form_submit($form, &$form_state)
 /**
  * Ajax callback for the 'add another rule' button.
  *
- * @param array $form
+ * @param $form
  *   Array representing the form.
- * @param array $form_state
+ * @param $form_state
  *   Array representing the current form state.
  *
  * @return array
@@ -294,9 +298,9 @@ function sharpspring_contextual_blocks_add_more_callback($form, $form_state) {
 /**
  * Submit callback for 'Add Rule' button, adds rule row.
  *
- * @param array $form
+ * @param $form
  *   Array representing the form.
- * @param array $form_state
+ * @param $form_state
  *   Array representing the current form state.
  */
 function sharpspring_contextual_blocks_add_rule_add_more($form, &$form_state) {
@@ -307,9 +311,9 @@ function sharpspring_contextual_blocks_add_rule_add_more($form, &$form_state) {
 /**
  * Removes rule from list.
  *
- * @param array $form
+ * @param $form
  *   Array representing the form.
- * @param array $form_state
+ * @param $form_state
  *   Array representing the current form state.
  */
 function sharpspring_contextual_blocks_add_rule_remove($form, &$form_state) {
@@ -350,9 +354,9 @@ function sharpspring_contextual_blocks_add_rule_remove($form, &$form_state) {
 /**
  * Returns a form to confirm deletion of the passed contextual rule.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  * @param int $rule_id
  *   Value of the rule_id field representing this rule in the database.
@@ -409,9 +413,9 @@ function sharpspring_contextual_blocks_delete_rule_form($form, &$form_state, $ru
 /**
  * Handles submission of the delete rule form.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array of submitted form values.
  */
 function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_state) {
@@ -432,7 +436,7 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
       $message = t('Failed removing block rule !id from database: @err',
         array(
           '!id' => $form_state['values']['rule_id'],
-          '@err' => $e
+          '@err' => $e,
         ));
       watchdog('Sharpspring',$message,WATCHDOG_NOTICE);
       form_set_error('rule_id',$message);
@@ -450,9 +454,9 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
 /**
  * Returns a form to confirm deletion of the passed SharpSpring block.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  * @param int $ss_bid
  *   Value of the ss_bid field representing this block in the database.
@@ -510,9 +514,9 @@ function sharpspring_contextual_blocks_delete_block_form($form, &$form_state, $s
 /**
  * Handles submission of the delete block form.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array of submitted form values.
  */
 function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_state) {
@@ -548,9 +552,9 @@ function sharpspring_contextual_blocks_delete_block_form_submit($form, &$form_st
 /**
  * Returns a form to edit the passed contextual rule.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  * @param int $rule_id
  *   Value of the data_id field representing this rule in the database.
@@ -603,9 +607,9 @@ function sharpspring_contextual_blocks_edit_rule_form($form, &$form_state, $rule
 /**
  * Handles edit rule form submission.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  */
 function sharpspring_contextual_blocks_edit_rule_form_submit($form, &$form_state) {
@@ -631,9 +635,9 @@ function sharpspring_contextual_blocks_edit_rule_form_submit($form, &$form_state
 /**
  * Returns a form to add a new SharpSpring contextual block.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  * @param int $ss_bid
  *   SharpSpring block id.
@@ -653,9 +657,9 @@ function sharpspring_contextual_blocks_add_block_form($form, &$form_state, $ss_b
 /**
  * Handles saving a new SharpSpring contextual block.
  *
- * @param array $form
+ * @param $form
  *   An array of form elements.
- * @param array $form_state
+ * @param $form_state
  *   An array representing the current form state.
  */
 function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state) {

@@ -84,9 +84,9 @@ function sharpspring_webforms_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Defines the SharpSpring Webform configuration form.
  *
- * @param array $form
+ * @param $form
  *   An array defining the form.
- * @param array $form_state
+ * @param $form_state
  *   An array defining the current state of the form.
  */
 function sharpspring_webforms_config_form($form, &$form_state) {
@@ -185,9 +185,9 @@ function sharpspring_webforms_config_form($form, &$form_state) {
 /**
  * SharpSpring Webform admin form validation.
  *
- * @param array $form
+ * @param $form
  *   An array defining the form.
- * @param array $form_state
+ * @param $form_state
  *   An array defining the current state of the form.
  */
 function sharpspring_webforms_config_form_validate(&$form, &$form_state) {
@@ -218,9 +218,9 @@ function sharpspring_webforms_config_form_validate(&$form, &$form_state) {
 /**
  * SharpSpring Webform admin form submit.
  *
- * @param array $form
+ * @param $form
  *   An array defining the form.
- * @param array $form_state
+ * @param $form_state
  *   An array defining the current state of the form.
  */
 function sharpspring_webforms_config_form_submit(&$form, &$form_state) {
