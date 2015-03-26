@@ -411,7 +411,7 @@ function _sharpspring_contextual_blocks_insert_rule($rules, $name, $description)
  * @return int
  *   Returns the inserted block id.
  */
-function _sharpspring_contextual_blocks_insert_block($name, $description, $reactions) {
+function _sharpspring_contextual_blocks_insert_block($name, $description, array $reactions) {
   $new_bid = db_insert('sharpspring_contextual_blocks')
     ->fields(array(
       'name' => $name,

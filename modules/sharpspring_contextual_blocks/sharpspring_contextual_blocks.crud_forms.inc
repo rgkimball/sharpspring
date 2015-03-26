@@ -115,7 +115,7 @@ function _sharpspring_contextual_blocks_set_rule_form(&$form, &$form_state) {
 /**
  * Common helper function to define the block add/edit form.
  *
- * @param $ss_bid
+ * @param int $ss_bid
  *   The block id.
  */
 function _sharpspring_contextual_set_block_form(&$form, &$form_state, $ss_bid) {

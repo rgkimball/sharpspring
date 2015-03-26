@@ -62,12 +62,13 @@ function sharpspring_page_build(&$page) {
     // Add javascript to handle Sharpspring callback.
     $path = drupal_get_path('module', 'sharpspring');
     $page['page_top']['#attached']['js'][] = array(
-      'data' => array('sharpspring' => array(
-        'domain' => $domain,
-        'id' => $id,
-        'segmentationField' => $segment_field,
-      )),
-      'type' => 'setting'
+      'data' => array(
+        'sharpspring' => array(
+          'domain' => $domain,
+          'id' => $id,
+          'segmentationField' => $segment_field,
+        )),
+      'type' => 'setting',
     );
     $page['page_top']['#attached']['js'][] = $path . '/js/drupal_sharpspring.js';
 
