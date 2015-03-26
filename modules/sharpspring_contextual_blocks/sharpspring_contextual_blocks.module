@@ -19,7 +19,7 @@ function sharpspring_contextual_blocks_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sharpspring_contextual_blocks_config_form'),
     'access arguments' => array('administer sharpspring'),
-    'file' => 'includes/sharpspring_contextual_blocks.admin.inc',
+    'file' => 'sharpspring_contextual_blocks.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 10,
   );
