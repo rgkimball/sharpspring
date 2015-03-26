@@ -419,7 +419,7 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
     $rule_name = (!empty($form_state['values']['rule_name'])) ? $form_state['values']['rule_name'] : '';
 
     try {
-      
+
       db_delete('sharpspring_contextual_block_rules')
         ->condition('rule_id', $form_state['values']['rule_id'])
         ->execute();
@@ -691,7 +691,7 @@ function sharpspring_contextual_blocks_add_block_form_submit($form, &$form_state
       'delta',
       'cache',
     ));
-    foreach (list_themes() as $key => $theme) {
+    foreach (list_themes() as $theme) {
       if ($theme->status) {
         $region = !empty($form_state['values']['regions'][$theme->name]) ? $form_state['values']['regions'][$theme->name] : BLOCK_REGION_NONE;
         $query->values(array(

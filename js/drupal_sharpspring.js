@@ -3,6 +3,8 @@
  * Sharpspring specific javascript.
  */
 
+"use strict";
+
 /**
  * Handles sharpspring response.
  *
@@ -15,7 +17,8 @@ function ssDrupalCallback(resp) {
   if (resp) {
     if (resp.contact) {
       sendData = resp.contact;
-    } else if (resp.lead) {
+    }
+    else if (resp.lead) {
       sendData = resp.lead;
     }
     Drupal.settings.sharpspring.response = sendData;
