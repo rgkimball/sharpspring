@@ -438,15 +438,15 @@ function sharpspring_contextual_blocks_delete_rule_form_submit($form, &$form_sta
           '!id' => $form_state['values']['rule_id'],
           '@err' => $e,
         ));
-      watchdog('Sharpspring',$message,WATCHDOG_NOTICE);
-      form_set_error('rule_id',$message);
+      watchdog('Sharpspring', $message, WATCHDOG_NOTICE);
+      form_set_error('rule_id', $message);
 
     }
 
     drupal_goto('admin/config/system/sharpspring/blocks/rules');
   }
   else {
-    form_set_error('rule_id',t('Invalid value supplied for rule id: !id',
+    form_set_error('rule_id', t('Invalid value supplied for rule id: !id',
       array('!id' => $form_state['values']['rule_id'])));
   }
 }
