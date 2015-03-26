@@ -7,11 +7,6 @@
 /**
  * Defines the block config form.
  *
- * @param $form
- *   An array containing form values.
- * @param $form_state
- *   An array containing current form state values.
- *
  * @return array
  *   The final form array
  */
@@ -96,11 +91,6 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
 
 /**
  * Defines the block rules config form.
- *
- * @param $form
- *   An array containing form values.
- * @param $form_state
- *   An array containing current form state values.
  *
  * @return array
  *   The final form array
@@ -238,11 +228,6 @@ function sharpspring_contextual_blocks_rules_config_form($form, &$form_state) {
 
 /**
  * Submit handler for the contextual blocks config form.
- *
- * @param $form
- *   An array that defines the form.
- * @param $form_state
- *   An array of submitted values for the form.
  */
 function sharpspring_contextual_blocks_rules_config_form_submit($form, &$form_state) {
   // First save the existing block information.
