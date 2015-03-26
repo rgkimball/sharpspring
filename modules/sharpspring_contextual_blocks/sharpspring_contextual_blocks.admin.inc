@@ -39,11 +39,14 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
 
     // Build the table rows.
     $delta = 'sharpspring_contextual_block_' . $bid;
+    $dest = check_url('admin/config/system/sharpspring/blocks');
+
     $rows[$bid] = array(
       'data' => array(
         // Block name column.
         check_plain($name),
         check_plain($description),
+
         // Operations.
         array(
           'data' => array(
@@ -54,7 +57,7 @@ function sharpspring_contextual_blocks_config_form($form, &$form_state) {
               'attributes' => array(),
               'html' => FALSE,
               'query' => array(
-                'destination' => 'admin/config/system/sharpspring/blocks',
+                'destination' => $dest,
               ),
             ),
           ),
