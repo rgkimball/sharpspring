@@ -330,12 +330,12 @@ function sharpspring_contextual_blocks_add_rule_remove($form, &$form_state) {
       $new_vals[] = $rule;
     }
 
-    $form_state['input']['rules_fieldset'] = $new_vals;
+    $form_state['values']['rules_fieldset'] = $new_vals;
     $form_state['num_rules']--;
 
     if ($form_state['num_rules'] == 0) {
       // If this is the last rule, clear out the value.
-      $form_state['input']['rules_fieldset'][0] = array(
+      $form_state['values']['rules_fieldset'][0] = array(
         'fieldname' => '',
         'value' => '',
       );
